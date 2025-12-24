@@ -38,7 +38,7 @@ export function calculateEnergyYear(alturaP:number, acimutP:number, latitud:numb
     return calculateEnergyRange(alturaP, acimutP, latitud, 1, 365);
 }
 
-export function calculateEnergyMonth(alturaP:number, acimutP:number, latitud:number, mes:number): number{
+function calculateEnergyMonth(alturaP:number, acimutP:number, latitud:number, mes:number): number{
     let diaInicio = 1;
 
     for (let m = 1; m < mes; m++){
@@ -48,4 +48,15 @@ export function calculateEnergyMonth(alturaP:number, acimutP:number, latitud:num
     const diaFin = diaInicio + diasPorMes[mes - 1] - 1;
 
     return calculateEnergyRange(alturaP, acimutP, latitud, diaInicio, diaFin);
+}
+
+export function calculateEnergyMonths(alturaP: number, acimutP: number, latitud: number, meses: number[]): number {
+    let energiaTotal = 0;
+
+    for (const mes of meses) {
+        if (mes < 1 || mes > 12) continue; 
+        energiaTotal += calculateEnergyMonth(alturaP, acimutP, latitud, mes);
+    }
+
+    return energiaTotal;
 }

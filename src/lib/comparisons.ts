@@ -1,4 +1,4 @@
-import { calculateEnergyYear } from './calculations';
+import { calculateEnergyMonths, calculateEnergyYear } from './calculations';
 
 export interface PanelPosition {
   altura: number;
@@ -24,11 +24,14 @@ export function generatePositions(alturaStep = 5, acimutStep = 5): PanelPosition
 export function comparePositionsYear(positions: PanelPosition[], latitud: number): PositionResult[] {
   return positions.map((pos) => ({
     ...pos,
-    energia: calculateEnergyYear(
-      pos.altura,
-      pos.acimut,
-      latitud
-    )
+    energia: calculateEnergyYear(pos.altura, pos.acimut, latitud)
+  }));
+}
+
+export function comparePositionsMonths(positions: PanelPosition[], latitud: number, meses: number[]): PositionResult[] {
+  return positions.map((pos) => ({
+    ...pos,
+    energia: calculateEnergyMonths(pos.altura, pos.acimut, latitud, meses)
   }));
 }
 
