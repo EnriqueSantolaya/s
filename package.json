@@ -19,5 +19,9 @@
 		"svelte-check": "^4.0.0",
 		"typescript": "^5.0.0",
 		"vite": "^7.0.4"
+	},
+	"dependencies": {
+		"@prisma/client": "^6.17.1",
+		"prisma": "^6.17.1"
 	}
 }
