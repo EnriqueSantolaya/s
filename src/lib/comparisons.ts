@@ -9,9 +9,26 @@ export interface PositionResult extends PanelPosition {
   energia: number;
 }
 
-export function generatePositions(alturaStep = 5, acimutStep = 5): PanelPosition[] {
+export function generatePositions(alturaStep = 5, acimutStep = 5, alturaFija?: number, acimutFijo?: number): PanelPosition[] {
   const positions: PanelPosition[] = [];
 
+  // Si la altura esta fijada
+  if (alturaFija !== undefined) {
+    for (let acimut = -180; acimut <= 180; acimut += acimutStep) {
+      positions.push({ altura: alturaFija, acimut });
+    }
+    return positions;
+  }
+
+  // Si el acimut esta fijado
+  if (acimutFijo !== undefined) {
+    for (let altura = 0; altura <= 90; altura += alturaStep) {
+      positions.push({ altura, acimut: acimutFijo });
+    }
+    return positions;
+  }
+
+  // Si ninguno esta fijado
   for (let altura = 0; altura <= 90; altura += alturaStep) {
     for (let acimut = -180; acimut <= 180; acimut += acimutStep) {
       positions.push({ altura, acimut });

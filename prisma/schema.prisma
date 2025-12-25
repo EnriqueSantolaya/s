@@ -18,5 +18,34 @@ model User {
   id           Int      @id @default(autoincrement())
   username     String   @unique
   passwordHash String
+  projects  Project[]
   createdAt    DateTime @default(now())
 }
+
+model Project {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  latitud   Float
+  meses     Int[]?
+  alturaFija Int?
+  acimutFijo Int?
+
+  result    Result?
+
+  createdAt DateTime @default(now())
+}
+
+model Result {
+  id        String   @id @default(uuid())
+  projectId String   @unique
+  project   Project  @relation(fields: [projectId], references: [id])
+
+  altura    Float
+  acimut    Float
+  energia   Float
+
+  createdAt DateTime @default(now())
+}
+

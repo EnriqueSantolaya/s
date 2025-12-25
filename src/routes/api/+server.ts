@@ -24,21 +24,39 @@ export function GET({ cookies }) {
     );
   }
 
-  const mesesCookie = cookies.get('meses');
+  const alturaCookie = cookies.get('altura');
+  const acimutCookie = cookies.get('acimut');
 
-  const positions = generatePositions(5, 5);
-  let results;
+  const altura = alturaCookie !== undefined ? Number(alturaCookie) : undefined;
+  const acimut = acimutCookie !== undefined ? Number(acimutCookie) : undefined;
 
-  if (mesesCookie) {
-    const meses = mesesCookie
-      .split(',')
-      .map(Number)
-      .filter(m => m >= 1 && m <= 12);
-
-    results = comparePositionsMonths(positions, latitud, meses);
-  } else {
-    results = comparePositionsYear(positions, latitud);
+  if ( (altura !== undefined && Number.isNaN(altura)) || (acimut !== undefined && Number.isNaN(acimut)) ) {
+    return json(
+        { error: 'Invalid altura or acimut in cookies' }, 
+        { status: 400 }
+    );
   }
+
+  if (altura !== undefined && acimut !== undefined) {
+    return json(
+      { error: 'Provide either altura or acimut, not both' },
+      { status: 400 }
+    );
+  }
+
+  const positions = generatePositions(5, 5, altura, acimut);
+
+  const mesesCookie = cookies.get('meses');
+  const meses = mesesCookie !== undefined
+    ? mesesCookie
+        .split(',')
+        .map(Number)
+        .filter(m => m >= 1 && m <= 12)
+    : undefined;
+  
+  const results = meses && meses.length > 0
+    ? comparePositionsMonths(positions, latitud, meses)
+    : comparePositionsYear(positions, latitud);
 
   const best = getBestPosition(results);
 
