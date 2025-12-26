@@ -27,25 +27,16 @@ model Project {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
 
+  // Parameters
   latitud   Float
   meses     Int[]
   alturaFija Int?
   acimutFijo Int?
 
-  result    Result?
+  // Results
+  altura    Float?
+  acimut    Float?
+  energia   Float?
 
   createdAt DateTime @default(now())
 }
-
-model Result {
-  id        String   @id @default(uuid())
-  projectId String   @unique
-  project   Project  @relation(fields: [projectId], references: [id])
-
-  altura    Float
-  acimut    Float
-  energia   Float
-
-  createdAt DateTime @default(now())
-}
-
