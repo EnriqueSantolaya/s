@@ -6,6 +6,7 @@ import {
   getBestPosition
 } from '$lib/comparisons';
 
+// Get best result
 export function GET({ cookies }) {
   const latitudCookie = cookies.get('latitud');
 
