@@ -21,7 +21,7 @@
 		"vite": "^7.0.4"
 	},
 	"dependencies": {
-		"@prisma/client": "^6.17.1",
-		"prisma": "^6.17.1"
+		"@prisma/client": "^6.19.1",
+		"prisma": "^6.19.1"
 	}
 }

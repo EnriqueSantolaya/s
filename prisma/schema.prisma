@@ -15,7 +15,7 @@ datasource db {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
+  id           String      @id @default(uuid())
   username     String   @unique
   passwordHash String
   projects  Project[]
@@ -28,7 +28,7 @@ model Project {
   user      User     @relation(fields: [userId], references: [id])
 
   latitud   Float
-  meses     Int[]?
+  meses     Int[]
   alturaFija Int?
   acimutFijo Int?
 
