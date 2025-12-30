@@ -1,4 +1,5 @@
 import { calculateEnergyMonths, calculateEnergyYear } from './calculations';
+import type { Obstacle } from '$lib/obstacles';
 
 export interface PanelPosition {
   altura: number;
@@ -38,17 +39,17 @@ export function generatePositions(alturaStep = 5, acimutStep = 5, alturaFija?: n
   return positions;
 }
 
-export function comparePositionsYear(positions: PanelPosition[], latitud: number): PositionResult[] {
+export function comparePositionsYear(positions: PanelPosition[], latitud: number, obstacles:Obstacle[] = []): PositionResult[] {
   return positions.map((pos) => ({
     ...pos,
-    energia: calculateEnergyYear(pos.altura, pos.acimut, latitud)
+    energia: calculateEnergyYear(pos.altura, pos.acimut, latitud, obstacles)
   }));
 }
 
-export function comparePositionsMonths(positions: PanelPosition[], latitud: number, meses: number[]): PositionResult[] {
+export function comparePositionsMonths(positions: PanelPosition[], latitud: number, meses: number[], obstacles:Obstacle[] = []): PositionResult[] {
   return positions.map((pos) => ({
     ...pos,
-    energia: calculateEnergyMonths(pos.altura, pos.acimut, latitud, meses)
+    energia: calculateEnergyMonths(pos.altura, pos.acimut, latitud, meses, obstacles)
   }));
 }
 

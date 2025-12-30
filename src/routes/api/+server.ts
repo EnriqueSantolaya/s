@@ -5,35 +5,31 @@ import {
   comparePositionsMonths,
   getBestPosition
 } from '$lib/comparisons';
+import type { Obstacle } from '$lib/obstacles.js';
 
 // Get best result
-export function GET({ cookies }) {
-  const latitudCookie = cookies.get('latitud');
+export async function POST({ request }) { 
 
-  if (!latitudCookie) {
+  const body = await request.json();
+
+  const { latitud, altura, acimut, meses, obstacles } = body as {
+    latitud: number;
+    altura?: number;
+    acimut?: number;
+    meses?: number[];
+    obstacles?: Obstacle[];
+  };
+
+  if (latitud === undefined || Number.isNaN(latitud)) {
     return json(
-      { error: 'Latitud not found in cookies' },
+      { error: 'Invalid latitud' },
       { status: 400 }
     );
   }
-
-  const latitud = Number(latitudCookie);
-  if (Number.isNaN(latitud)) {
-    return json(
-      { error: 'Invalid latitud in cookies' },
-      { status: 400 }
-    );
-  }
-
-  const alturaCookie = cookies.get('altura');
-  const acimutCookie = cookies.get('acimut');
-
-  const altura = alturaCookie !== undefined ? Number(alturaCookie) : undefined;
-  const acimut = acimutCookie !== undefined ? Number(acimutCookie) : undefined;
 
   if ( (altura !== undefined && Number.isNaN(altura)) || (acimut !== undefined && Number.isNaN(acimut)) ) {
     return json(
-        { error: 'Invalid altura or acimut in cookies' }, 
+        { error: 'Invalid altura or acimut' }, 
         { status: 400 }
     );
   }
@@ -47,17 +43,9 @@ export function GET({ cookies }) {
 
   const positions = generatePositions(5, 5, altura, acimut);
 
-  const mesesCookie = cookies.get('meses');
-  const meses = mesesCookie !== undefined
-    ? mesesCookie
-        .split(',')
-        .map(Number)
-        .filter(m => m >= 1 && m <= 12)
-    : undefined;
-  
   const results = meses && meses.length > 0
-    ? comparePositionsMonths(positions, latitud, meses)
-    : comparePositionsYear(positions, latitud);
+    ? comparePositionsMonths(positions, latitud, meses, obstacles)
+    : comparePositionsYear(positions, latitud, obstacles);
 
   const best = getBestPosition(results);
 
