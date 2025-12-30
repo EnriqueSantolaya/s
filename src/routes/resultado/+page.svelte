@@ -8,6 +8,8 @@
     const latitud = latitudStore;
     const obstacles = obstaclesStore;
 
+    let isLoggedIn = false;
+
     // Resultado de mejor posición
     let bestPosition: { altura: number; acimut: number; energia: number } | null = null;
     let errorMessage: string | null = null;
@@ -40,7 +42,41 @@
         }
     }
 
+    // Guardar proyecto
+    async function saveProject() {
+        if (!bestPosition) return;
+
+        const response = await fetch('/api/projects', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                latitud: $latitud,
+                meses: $cavanzada.meses ?? [],
+                alturaFija: $cavanzada.altura ?? null,
+                acimutFijo: $cavanzada.acimut ?? null,
+                altura: bestPosition.altura,
+                acimut: bestPosition.acimut,
+                energia: bestPosition.energia
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            alert(data.error ?? 'Error al guardar');
+        } else {
+            alert('Proyecto guardado correctamente');
+        }
+    }
+
+    async function checkAuth() {
+        const res = await fetch('/api/auth');
+        const data = await res.json();
+        isLoggedIn = !!data.userId;
+    }
+
     onMount(() => {
+        checkAuth();
         if ($latitud !== null) {
             fetchBestPosition();
         }
@@ -80,4 +116,12 @@
     </div>
 {:else}
     <p>Calculando la mejor posición...</p>
+{/if}
+
+{#if isLoggedIn && bestPosition}
+    <button on:click={saveProject}>
+        Guardar proyecto
+    </button>
+{:else if !isLoggedIn}
+    <p>Inicia sesión para guardar el proyecto</p>
 {/if}
