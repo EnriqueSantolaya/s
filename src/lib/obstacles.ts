@@ -1,18 +1,19 @@
-export type Obstacle = RectangleObstacle | TriangleObstacle;
+export interface ObstacleBase {
+    name: string;      
+    acimutMin: number;
+    acimutMax: number;
+    altura: number;
+}
 
-export interface RectangleObstacle {
+export interface RectangleObstacle extends ObstacleBase {
     type: 'rectangle';
-    acimutMin: number;
-    acimutMax: number;
-    altura: number;
 }
 
-export interface TriangleObstacle {
+export interface TriangleObstacle extends ObstacleBase {
     type: 'triangle';
-    acimutMin: number;
-    acimutMax: number;
-    altura: number;
 }
+
+export type Obstacle = RectangleObstacle | TriangleObstacle;
 
 export function isBlockedByObstacle(alturaS: number, acimutS: number, obstacles: Obstacle[]): boolean {
     for (const obs of obstacles) {

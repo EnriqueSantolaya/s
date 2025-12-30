@@ -1,7 +1,10 @@
 import { writable } from 'svelte/store';
 import type { Obstacle } from '$lib/obstacles';
+import { browser } from '$app/environment';
 
 function loadObstacles(): Obstacle[] {
+    if (!browser) return [];
+
     const stored = localStorage.getItem('obstacles');
     if (!stored) return [];
     try {
@@ -12,6 +15,7 @@ function loadObstacles(): Obstacle[] {
 }
 
 function saveObstacles(obs: Obstacle[]) {
+    if (!browser) return;
     localStorage.setItem('obstacles', JSON.stringify(obs));
 }
 

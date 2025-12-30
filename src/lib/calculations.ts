@@ -12,7 +12,7 @@ function rad2deg(rad: number): number {
 
 export function calculateEnergyMoment(alturaP:number, acimutP:number, latitud:number, dia:number, hora:number, obstacles:Obstacle[] = []): number{
     // Mirar tests para ver si esta bien
-    const declinS = deg2rad( 23.5 * Math.sin( 2 * Math.PI * (284 + dia) / 365 ));
+    const declinS = deg2rad(23.5) * Math.sin( 2 * Math.PI * (284 + dia) / 365 );
     const angulo_horario = deg2rad( 15 * ( hora - 12 ));
 
     const sinAlturaS = Math.sin(declinS) * Math.sin(deg2rad(latitud)) + Math.cos(declinS) * Math.cos(deg2rad(latitud)) * Math.cos(angulo_horario);
@@ -22,7 +22,7 @@ export function calculateEnergyMoment(alturaP:number, acimutP:number, latitud:nu
     const cosAcimutS = ( Math.sin(alturaS) * Math.sin(deg2rad(latitud)) - Math.sin(declinS) ) / ( Math.cos(alturaS) * Math.cos(deg2rad(latitud)) );
     const cosA = Math.max(-1, Math.min(1, cosAcimutS));
     let acimutS = Math.acos(cosA);
-    if (angulo_horario > 0) {
+    if (angulo_horario > 0) { // Esto esta en convención 0ºNorte - 360ºNorte, revisar
        acimutS = 2 * Math.PI - acimutS;
     }
 
