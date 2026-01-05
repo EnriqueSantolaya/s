@@ -1,20 +1,11 @@
-export interface ObstacleBase {
-    name: string;   
-    distancia: number;   
+export type Obstacle = {
+    name: string;
+    distancia: number;
     alturaFisica: number;
     acimutCentro: number;
     anchoFactor: number;
-}
-
-export interface RectangleObstacle extends ObstacleBase {
-    type: 'rectangle';
-}
-
-export interface TriangleObstacle extends ObstacleBase {
-    type: 'triangle';
-}
-
-export type Obstacle = RectangleObstacle | TriangleObstacle;
+    type: 'tree' | 'mountain' | 'building' | 'wall' | 'custom';
+};
 
 export function isBlockedByObstacle(alturaS: number, acimutS: number, obstacles: Obstacle[]): boolean {
     for (const obs of obstacles) {
@@ -23,14 +14,16 @@ export function isBlockedByObstacle(alturaS: number, acimutS: number, obstacles:
         const acimutMin = obs.acimutCentro - anchoAngular / 2;
         const acimutMax = obs.acimutCentro + anchoAngular / 2;
 
-        if (obs.type === 'rectangle') {
+        const geometricType = getGeometricType(obs.type);
+
+        if (geometricType === 'rectangle') {
             if (
                 alturaS <= alturaAngular &&
                 acimutS >= acimutMin && acimutS <= acimutMax
             ) {
                 return true;
             }
-        } else if (obs.type === 'triangle') {
+        } else if (geometricType === 'triangle') {
             const acimutCentro = (acimutMin + acimutMax) / 2;
             const alturaMaxActual = acimutS <= acimutCentro
                 ? (acimutS - acimutMin) * (alturaAngular / (acimutCentro - acimutMin))
@@ -41,4 +34,18 @@ export function isBlockedByObstacle(alturaS: number, acimutS: number, obstacles:
         }
     }
     return false;
+}
+
+function getGeometricType(type: 'tree' | 'mountain' | 'building' | 'wall' | 'custom'): 'rectangle' | 'triangle' {
+    switch (type) {
+        case 'tree':
+        case 'mountain':
+            return 'triangle'; // Los árboles y montañas los representamos como triángulos
+        case 'building':
+        case 'wall':
+        case 'custom':
+            return 'rectangle';  // Los edificios y paredes los representamos como rectángulos
+        default:
+            return 'rectangle';  // Default por seguridad
+    }
 }

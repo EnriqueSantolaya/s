@@ -6,7 +6,7 @@
   import { onMount } from 'svelte';
 
   let newNombre = '';
-  let newType: 'rectangle' | 'triangle' = 'rectangle';
+  let newType: 'tree' | 'mountain' | 'building' | 'wall' | 'custom' = 'wall'; // Tipo de obstáculo
   let distancia = 0; // distancia al obstáculo
   let alturaFisica = 0; // altura real del obstáculo
   let acimutCentro = 0; // acimut central
@@ -226,17 +226,26 @@
       </div>
 
       {#each $obstaclesStore as obs, index}
-        <div
-          class="obstacle {obs.type}"
-          style="
-            left: {dragPositions[index]?.x ?? getVisualPosition(obs.distancia, obs.acimutCentro).x}px;
-            top: {dragPositions[index]?.y ?? getVisualPosition(obs.distancia, obs.acimutCentro).y}px;
-            transform: translate(-50%, -50%);
-          "
+        <div class="obstacle {obs.type}"
+          style="left: {dragPositions[index]?.x ?? getVisualPosition(obs.distancia, obs.acimutCentro).x}px;
+                  top: {dragPositions[index]?.y ?? getVisualPosition(obs.distancia, obs.acimutCentro).y}px;
+                  transform: translate(-50%, -50%);"
           title={obs.name}
           on:click={() => selectObstacleFromCircle(obs, index)}
-          on:mousedown={(e) => startDrag(index, e)}
-        ></div>
+          on:mousedown={(e) => startDrag(index, e)}>
+          <!-- Representación visual del tipo -->
+          {#if obs.type === 'tree'}
+              🌲
+          {:else if obs.type === 'mountain'}
+              🏔️
+          {:else if obs.type === 'building'}
+              🏢
+          {:else if obs.type === 'wall'}
+              🧱
+          {:else}
+              ⚪
+          {/if}
+      </div>
       {/each}
 
       <div class="elevation-input">
@@ -266,7 +275,7 @@
               showAddPanel = true;
 
               newNombre = '';
-              newType = 'rectangle';
+              newType = 'wall';
               distancia = 0;
               alturaFisica = 0;
               acimutCentro = 0;
@@ -354,10 +363,13 @@
 
       <!-- Forma -->
       <div class="field">
-        <label>Forma</label>
+        <label>Tipo de obstáculo</label>
         <select bind:value={newType}>
-          <option value="rectangle">Cuadrado</option>
-          <option value="triangle">Triángulo</option>
+          <option value="tree">🌲 Árbol</option>
+          <option value="mountain">⛰️ Montaña</option>
+          <option value="building">🏢 Edificio</option>
+          <option value="wall">🧱 Muro</option>
+          <option value="custom">❓ Otro</option>
         </select>
       </div>
 
@@ -386,12 +398,11 @@
 </div>
 
 <style>
-  
   .page {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    padding: 16px;
+    height: calc(100vh - 40px);
+    padding: 6px;
     box-sizing: border-box;
   }
 
@@ -400,12 +411,12 @@
     display: flex;
     justify-content: center;
     gap: 60px;
-    margin-bottom: 24px;
+    margin-bottom: 12px;
   }
 
   .nav-circle {
-    width: 90px;
-    height: 90px;
+    width: 80px;
+    height: 60px;
     border-radius: 50%;
     border: 1px solid black;
 
@@ -435,7 +446,7 @@
   .top-center {
     display: flex;
     justify-content: center;
-    margin-bottom: 24px;
+    margin-bottom: 12px;
   }
 
   .circle-wrapper {
@@ -496,6 +507,36 @@
   .obstacle {
     position: absolute;
     cursor: grab;
+  }
+
+  .obstacle.tree {
+    width: 30px; 
+    height: 30px;
+    font-size: 24px; 
+  }
+
+  .obstacle.mountain {
+      width: 30px;
+      height: 30px;
+      font-size: 24px;
+  }
+
+  .obstacle.building {
+      width: 30px;
+      height: 30px;
+      font-size: 24px;
+  }
+
+  .obstacle.wall {
+      width: 30px;
+      height: 30px;
+      font-size: 24px;
+  }
+
+  .obstacle.custom {
+      width: 30px;
+      height: 30px;
+      font-size: 24px;
   }
 
   .obstacle.rectangle {
@@ -565,7 +606,7 @@
     margin: 1px 0 0 0;
 
     overflow-y: auto;
-    max-height: 240px;
+    max-height: 280px;
   }
 
   .obstacle-item {
