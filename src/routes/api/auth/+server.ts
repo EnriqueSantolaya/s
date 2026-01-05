@@ -7,13 +7,22 @@ export const GET: RequestHandler = async ({ cookies }) => {
     const token = cookies.get('auth');
 
     if (!token) {
-        return new Response(JSON.stringify({ user: null }), { status: 200 });
+        return new Response(JSON.stringify({ user: null }));
     }
 
     try {
         const payload = jwt.verify(token, JWT_SECRET) as { userId: string };
-        return new Response(JSON.stringify({ userId: payload.userId }), { status: 200 });
+
+        const user = await prisma.user.findUnique({
+            where: { id: payload.userId },
+            select: {
+                id: true,
+                username: true
+            }
+        });
+
+        return new Response(JSON.stringify({ user }));
     } catch {
-        return new Response(JSON.stringify({ user: null }), { status: 200 });
+        return new Response(JSON.stringify({ user: null }));
     }
 };

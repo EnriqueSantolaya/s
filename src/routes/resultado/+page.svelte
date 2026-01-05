@@ -3,12 +3,14 @@
     import { latitudStore } from '$lib/stores/latitud';
     import { obstaclesStore } from '$lib/stores/obstacles';
     import { onMount } from 'svelte';
+    import { elevacionPlacaStore } from '$lib/stores/elevacionPlaca';
     
     const cavanzada = configAvanzadaStore;
     const latitud = latitudStore;
     const obstacles = obstaclesStore;
+    const elevacionPlaca = elevacionPlacaStore;
 
-    let isLoggedIn = false;
+    let user: { id: string; username: string } | null = null;
 
     // Resultado de mejor posición
     let bestPosition: { altura: number; acimut: number; energia: number } | null = null;
@@ -72,7 +74,7 @@
     async function checkAuth() {
         const res = await fetch('/api/auth');
         const data = await res.json();
-        isLoggedIn = !!data.userId;
+        user = data.user ?? null;
     }
 
     onMount(() => {
@@ -89,6 +91,7 @@
 <div>Acimut: {$cavanzada.acimut ?? 'No guardado'}</div>
 <div>Meses: {$cavanzada.meses && $cavanzada.meses.length > 0 ? $cavanzada.meses.join(', ') : 'No guardados'}</div>
 <div>Latitud: {$latitud}</div>
+<div>Elevación placa: {$elevacionPlaca}</div>
 
 <h3>Obstáculos:</h3>
 {#if $obstacles.length > 0}
@@ -96,8 +99,9 @@
         {#each $obstacles as obs}
             <li>
                 <strong>{obs.name}</strong> ({obs.type})<br>
-                Altura: {obs.altura}<br>
-                Acimut: {obs.acimutMin}° – {obs.acimutMax}°
+                Altura: {obs.alturaFisica}m<br>
+                Distancia: {obs.distancia}m<br>
+                Acimut: {obs.acimutCentro}°, Factor Anchura: {obs.anchoFactor}
             </li>
         {/each}
     </ul>
@@ -118,10 +122,9 @@
     <p>Calculando la mejor posición...</p>
 {/if}
 
-{#if isLoggedIn && bestPosition}
-    <button on:click={saveProject}>
-        Guardar proyecto
-    </button>
-{:else if !isLoggedIn}
+{#if user && bestPosition}
+    <p>Logeado como <strong>{user.username}</strong></p>
+    <button on:click={saveProject}>Guardar proyecto</button>
+{:else if !user}
     <p>Inicia sesión para guardar el proyecto</p>
 {/if}

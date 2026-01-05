@@ -22,8 +22,8 @@ export function calculateEnergyMoment(alturaP:number, acimutP:number, latitud:nu
     const cosAcimutS = ( Math.sin(alturaS) * Math.sin(deg2rad(latitud)) - Math.sin(declinS) ) / ( Math.cos(alturaS) * Math.cos(deg2rad(latitud)) );
     const cosA = Math.max(-1, Math.min(1, cosAcimutS));
     let acimutS = Math.acos(cosA);
-    if (angulo_horario > 0) { // Esto esta en convención 0ºNorte - 360ºNorte, revisar
-       acimutS = 2 * Math.PI - acimutS;
+    if (angulo_horario > 0) {
+       acimutS = -acimutS;
     }
 
     if (isBlockedByObstacle( rad2deg(alturaS), rad2deg(acimutS), obstacles)) {

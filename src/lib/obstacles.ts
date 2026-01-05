@@ -1,8 +1,9 @@
 export interface ObstacleBase {
-    name: string;      
-    acimutMin: number;
-    acimutMax: number;
-    altura: number;
+    name: string;   
+    distancia: number;   
+    alturaFisica: number;
+    acimutCentro: number;
+    anchoFactor: number;
 }
 
 export interface RectangleObstacle extends ObstacleBase {
@@ -17,19 +18,24 @@ export type Obstacle = RectangleObstacle | TriangleObstacle;
 
 export function isBlockedByObstacle(alturaS: number, acimutS: number, obstacles: Obstacle[]): boolean {
     for (const obs of obstacles) {
+        const alturaAngular = Math.atan2(obs.alturaFisica, obs.distancia) * (180 / Math.PI);
+        const anchoAngular = alturaAngular * obs.anchoFactor;
+        const acimutMin = obs.acimutCentro - anchoAngular / 2;
+        const acimutMax = obs.acimutCentro + anchoAngular / 2;
+
         if (obs.type === 'rectangle') {
             if (
-                alturaS <= obs.altura &&
-                acimutS >= obs.acimutMin && acimutS <= obs.acimutMax
+                alturaS <= alturaAngular &&
+                acimutS >= acimutMin && acimutS <= acimutMax
             ) {
                 return true;
             }
         } else if (obs.type === 'triangle') {
-            const acimutCentro = (obs.acimutMin + obs.acimutMax) / 2;
+            const acimutCentro = (acimutMin + acimutMax) / 2;
             const alturaMaxActual = acimutS <= acimutCentro
-                ? (acimutS - obs.acimutMin) * (obs.altura / (acimutCentro - obs.acimutMin))
-                : (obs.acimutMax - acimutS) * (obs.altura / (obs.acimutMax - acimutCentro));
-            if (acimutS >= obs.acimutMin && acimutS <= obs.acimutMax && alturaS <= alturaMaxActual) {
+                ? (acimutS - acimutMin) * (alturaAngular / (acimutCentro - acimutMin))
+                : (acimutMax - acimutS) * (alturaAngular / (acimutMax - acimutCentro));
+            if (acimutS >= acimutMin && acimutS <= acimutMax && alturaS <= alturaMaxActual) {
                 return true;
             }
         }
