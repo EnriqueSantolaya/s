@@ -79,3 +79,32 @@ export function calculateEnergyMonths(alturaP: number, acimutP: number, latitud:
 
     return energiaTotal;
 }
+
+function getFirstDayOfMonth(mes: number): number {
+    let dia = 1;
+    for (let m = 1; m < mes; m++) {
+        dia += diasPorMes[m - 1];
+    }
+    return dia;
+}
+
+export function calculateEnergyFirstDayOfMonths(alturaP: number, acimutP: number, latitud: number, meses: number[], obstacles: Obstacle[] = []) {
+    return meses
+        .filter(m => m >= 1 && m <= 12)
+        .map(mes => {
+            const dia = getFirstDayOfMonth(mes);
+            const energia = calculateEnergyRange(
+                alturaP,
+                acimutP,
+                latitud,
+                dia,
+                dia,
+                obstacles
+            );
+
+            return {
+                mes,
+                energia
+            };
+        });
+}
