@@ -222,8 +222,16 @@
     display: flex;
     flex-direction: column;
     height: calc(100vh - 40px);
-    padding: 6px;
+    padding: 12px;
     box-sizing: border-box;
+
+    background: linear-gradient(
+      to bottom,
+      #eaf7ff 0%,
+      #ffffff 70%
+    );
+
+    font-family: 'Poppins', system-ui, sans-serif;
   }
 
   /* Navegación superior */
@@ -231,30 +239,43 @@
     display: flex;
     justify-content: center;
     gap: 60px;
+    margin-bottom: 16px;
   }
 
   /* Estilo de los botones de navegación superior */
   .nav-circle {
-    width: 80px;
-    height: 60px;
+    width: 90px;
+    height: 64px;
     border-radius: 50%;
-    border: 1px solid black;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    font-size: 14px;
+
+    font-size: 13px;
     line-height: 1.2;
     user-select: none;
+
+    background: white;
+    border: 1px solid rgba(15, 23, 42, 0.15);
+    color: #0f172a;
+
+    transition: all 0.2s ease;
   }
 
   .nav-circle.clickable {
     cursor: pointer;
   }
+  .nav-circle.clickable:hover {
+    background: #f8fafc;
+    transform: translateY(-2px);
+  }
 
   .nav-circle.active {
-    cursor: default;
-    font-weight: bold;
+    font-weight: 600;
+    background: #fde047;
+    border-color: #facc15;
+    box-shadow: 0 4px 10px rgba(250, 204, 21, 0.4);
   }
 
   button.nav-circle {
@@ -281,42 +302,58 @@
 
   h2 {
     text-align: center;
-    margin-bottom: 20px;  
-    }
+    margin: 8px 0 20px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #0f172a;
+  }
 
   /* Contenedor de Inputs */
   .inputs-container {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 600px;
+    margin: 0 auto 24px;
+
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin-top: 20px;
+    gap: 24px;
+
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
   }
 
   .input-group {
     display: flex;
-    flex-direction: row;
     align-items: center;
+    justify-content: space-between;
+    gap: 24px;
   }
 
   .input-group input {
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 150px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    border: 1px solid rgba(15, 23, 42, 0.2);
+    width: 160px;
+  }
+  .input-group input:focus {
+    outline: none;
+    border-color: #facc15;
   }
 
-  .arrow-container {
+  .arrow-container,
+  .altura-container {
     width: 100px;
     height: 100px;
-    margin-left: 30px;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     border-radius: 50%;
-    border: 1px solid #ccc;
+    background: #f8fafc;
+    border: 1px solid rgba(15, 23, 42, 0.15);
   }
 
   .arrow-container svg {
@@ -324,55 +361,68 @@
   }
 
   .months-title {
-    margin-top: 25px;
-    margin-bottom: 10px;
-    font-weight: 500;
     text-align: center;
-    color: #333;
-}
+    font-weight: 500;
+    color: #0f172a;
+    margin-bottom: 10px;
+  }
 
   .months-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
-    margin-top: 30px;
+    margin-bottom: 24px;
   }
 
   .month-panel {
-    padding: 10px 20px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+
+    border: 1px solid rgba(15, 23, 42, 0.15);
+    background: white;
     cursor: pointer;
-    text-align: center;
+
+    transition: all 0.2s ease;
+  }
+  .month-panel:hover {
+    background: #f8fafc;
   }
 
   .month-panel.selected {
-    background-color: #b0b0b0;
+    background: #0ea5e9;
     color: white;
+    border-color: #0284c7;
   }
 
   .error-message {
-    margin-top: 15px;
-    color: #b00020;
-    font-weight: 500;
+    margin-top: 12px;
+    color: #dc2626;
+    font-size: 0.85rem;
     text-align: center;
- }
+  }
 
   .bottom-button {
-    margin-top: 30px;
-    padding: 10px 20px;
-    width: 200px;
-    font-size: 16px;
     align-self: center;
-    background-color: #d3d3d3;
-    color: #333;
-    border: none;
-    border-radius: 5px;
+    margin-top: auto;
+
+    padding: 12px 24px;
+    width: 220px;
+
+    font-size: 1rem;
+    font-weight: 600;
+
+    background: #fde047;
+    border: 1px solid #facc15;
+    border-radius: 12px;
+
     cursor: pointer;
+    transition: all 0.2s ease;
   }
 
   .bottom-button:hover {
-    background-color: #b0b0b0;
+    background: #facc15;
+    transform: translateY(-1px);
   }
 </style>

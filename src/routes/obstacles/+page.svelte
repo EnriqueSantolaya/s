@@ -223,30 +223,32 @@
         <span class="direction o">O</span>
 
         <div class="center-dot"></div>
+
+        {#each $obstaclesStore as obs, index}
+          <div class="obstacle {obs.type}"
+            style="left: {dragPositions[index]?.x ?? getVisualPosition(obs.distancia, obs.acimutCentro).x}px;
+                    top: {dragPositions[index]?.y ?? getVisualPosition(obs.distancia, obs.acimutCentro).y}px;
+                    transform: translate(-50%, -50%);"
+            title={obs.name}
+            on:click={() => selectObstacleFromCircle(obs, index)}
+            on:mousedown={(e) => startDrag(index, e)}>
+            <!-- Representación visual del tipo -->
+            {#if obs.type === 'tree'}
+                🌲
+            {:else if obs.type === 'mountain'}
+                🏔️
+            {:else if obs.type === 'building'}
+                🏢
+            {:else if obs.type === 'wall'}
+                🧱
+            {:else}
+                ⚪
+            {/if}
+        </div>
+        {/each}
       </div>
 
-      {#each $obstaclesStore as obs, index}
-        <div class="obstacle {obs.type}"
-          style="left: {dragPositions[index]?.x ?? getVisualPosition(obs.distancia, obs.acimutCentro).x}px;
-                  top: {dragPositions[index]?.y ?? getVisualPosition(obs.distancia, obs.acimutCentro).y}px;
-                  transform: translate(-50%, -50%);"
-          title={obs.name}
-          on:click={() => selectObstacleFromCircle(obs, index)}
-          on:mousedown={(e) => startDrag(index, e)}>
-          <!-- Representación visual del tipo -->
-          {#if obs.type === 'tree'}
-              🌲
-          {:else if obs.type === 'mountain'}
-              🏔️
-          {:else if obs.type === 'building'}
-              🏢
-          {:else if obs.type === 'wall'}
-              🧱
-          {:else}
-              ⚪
-          {/if}
-      </div>
-      {/each}
+      
 
       <div class="elevation-input">
         <label>Elevación placa</label>
@@ -402,8 +404,17 @@
     display: flex;
     flex-direction: column;
     height: calc(100vh - 40px);
-    padding: 6px;
+    flex: 1;
+    padding: 12px;
     box-sizing: border-box;
+
+    background: linear-gradient(
+      to bottom,
+      #eaf7ff 0%,
+      #ffffff 70%
+    );
+
+    font-family: 'Poppins', system-ui, sans-serif;
   }
 
   /* Navegación superior */
@@ -411,35 +422,45 @@
     display: flex;
     justify-content: center;
     gap: 60px;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
   }
 
   .nav-circle {
-    width: 80px;
-    height: 60px;
+    width: 90px;
+    height: 64px;
     border-radius: 50%;
-    border: 1px solid black;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    text-align: center;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.2;
-
     user-select: none;
+
+    background: white;
+    border: 1px solid rgba(15, 23, 42, 0.15);
+    color: #0f172a;
+
+    transition: all 0.2s ease;
   }
 
   /* Círculos clicables */
   .nav-circle.clickable {
     cursor: pointer;
   }
+  .nav-circle.clickable:hover {
+    background: #f8fafc;
+    transform: translateY(-2px);
+  }
 
   /* Círculo actual (no clicable) */
   .nav-circle.active {
+    font-weight: 600;
+    background: #fde047;
+    border-color: #facc15;
+    box-shadow: 0 4px 10px rgba(250, 204, 21, 0.4);
     cursor: default;
-    font-weight: bold;
   }
 
   /* Círculo obstáculos */
@@ -451,19 +472,34 @@
 
   .circle-wrapper {
     position: relative;
-    display: inline-block;
+    z-index: 1;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    background: white;
+    padding: 16px;
+    border-radius: 20px;
+
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
   }
 
   .big-circle {
-    position: relative;
+    position: relative; 
     width: 250px;
     height: 250px;
     border-radius: 50%;
-    border: 1px solid black;
+
+    background: radial-gradient(circle at center, #f8fafc, #ffffff);
+    border: 1px solid rgba(15, 23, 42, 0.15);
+    z-index: 2;
   }
 
   .direction {
     position: absolute;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(15, 23, 42, 0.7);
     user-select: none;
   }
 
@@ -495,48 +531,42 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 14px;
-    height: 14px;
-    background: black;
+
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
-    border: none;
+
+    background: #0f172a;
+
     transform: translate(-50%, -50%);
-    padding: 0;
   }
 
   .obstacle {
     position: absolute;
     cursor: grab;
+    user-select: none;
+  }
+  
+  .obstacle:active {
+    cursor: grabbing;
   }
 
-  .obstacle.tree {
-    width: 30px; 
-    height: 30px;
-    font-size: 24px; 
+  .obstacle-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    border-radius: 10px;
+
+    padding: 6px 10px;
+    margin-bottom: 8px;
+
+    transition: background-color 0.2s ease;
   }
 
-  .obstacle.mountain {
-      width: 30px;
-      height: 30px;
-      font-size: 24px;
-  }
-
-  .obstacle.building {
-      width: 30px;
-      height: 30px;
-      font-size: 24px;
-  }
-
-  .obstacle.wall {
-      width: 30px;
-      height: 30px;
-      font-size: 24px;
-  }
-
-  .obstacle.custom {
-      width: 30px;
-      height: 30px;
-      font-size: 24px;
+  .obstacle-item:hover {
+    background: #f8fafc;
   }
 
   .obstacle.rectangle {
@@ -556,20 +586,27 @@
 
   .elevation-input {
     position: absolute;
-    top: calc(100% + 8px);
+    top: calc(100% + 12px);
     left: 50%;
     transform: translateX(-50%);
+
     background: white;
-    border: 1px solid black;
-    padding: 6px 8px;
-    border-radius: 6px;
+    border: 1px solid rgba(15, 23, 42, 0.15);
+    padding: 8px 10px;
+    border-radius: 10px;
+
     font-size: 12px;
     text-align: center;
+
+    z-index: 20; 
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.15);
   }
 
   .elevation-input input {
     width: 90px;
-    margin-top: 4px;
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid rgba(15, 23, 42, 0.2);
   }
 
   /* Zona principal */
@@ -590,6 +627,14 @@
   .list-container {
     width: 100%;
     max-width: 600px;
+
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+
+    box-shadow:
+      0 10px 30px rgba(15, 23, 42, 0.12);
+
     display: flex;
     flex-direction: column;
   }
@@ -598,6 +643,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+  .list-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
   }
 
   .obstacles-list {
@@ -648,7 +697,13 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
+    border: none;
+    background: #fde047;
+    font-size: 18px;
     cursor: pointer;
+  }
+  .add-btn:hover {
+    background: #facc15;
   }
 
   ul {
@@ -667,15 +722,19 @@
     position: absolute;
     top: 0;
     right: 0;
-    height: 100%;
+    height: calc(100vh - 40px);
     width: 350px;
-    border-left: 1px solid black;
-    padding: 16px;
+
+    background: white;
+    border-left: 1px solid rgba(15, 23, 42, 0.15);
+
+    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    background: white;
-    box-sizing: border-box;
+
+    box-shadow:
+      -10px 0 30px rgba(15, 23, 42, 0.15);
   }
 
   .panel-header {
@@ -720,10 +779,9 @@
 
   .field input,
   .field select {
-    padding: 6px 8px;
-    font-size: 14px;
-    border: 1px solid black;
-    border-radius: 6px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(15, 23, 42, 0.2);
   }
 
   /* Slider factor anchura */
@@ -780,13 +838,19 @@
   }
 
   .save-btn {
-    padding: 8px 16px;
+    padding: 10px 20px;
     font-size: 14px;
     cursor: pointer;
-    border: 1px solid black;
-    border-radius: 4px;
-    background-color: #4CAF50;
-    color: white;
+    border: none;
+    border-radius: 10px;
+
+    background: #fde047;
+    color: #0f172a;
+    font-weight: 600;
+  }
+
+  .save-btn:hover {
+    background: #facc15;
   }
 
   /* Reset visual del botón para que parezca un div */

@@ -37,5 +37,22 @@ model Project {
   acimut    Float?
   energia   Float?
 
+  obstacles Obstacle[]
+
+  createdAt DateTime @default(now())
+}
+
+model Obstacle {
+  id            String   @id @default(uuid())
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id])
+
+  name          String
+  distancia     Float
+  alturaFisica  Float
+  acimutCentro  Float
+  anchoFactor   Float
+  type          String   // 'tree' | 'mountain' | 'building' | 'wall' | 'custom'
+
   createdAt DateTime @default(now())
 }

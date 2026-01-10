@@ -21,7 +21,8 @@ export const GET: RequestHandler = async ({ cookies }) => {
 
     const projects = await prisma.project.findMany({
         where: { userId },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: 'desc' },
+        include: { obstacles: true }
     });
 
     return new Response(JSON.stringify(projects), { status: 200 });
@@ -49,7 +50,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
         acimutFijo,
         altura,
         acimut,
-        energia
+        energia,
+        obstacles
     } = await request.json();
 
     if (latitud === undefined || !Array.isArray(meses)) {
@@ -68,8 +70,21 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
             acimutFijo: acimutFijo ?? null,
             altura: altura ?? null,
             acimut: acimut ?? null,
-            energia: energia ?? null
-        }
+            energia: energia ?? null,
+            obstacles: {
+                create: Array.isArray(obstacles)
+                    ? obstacles.map((o: any) => ({
+                            name: o.name,
+                            distancia: o.distancia,
+                            alturaFisica: o.alturaFisica,
+                            acimutCentro: o.acimutCentro,
+                            anchoFactor: o.anchoFactor,
+                            type: o.type
+                        }))
+                    : []
+            }
+        },
+        include: { obstacles: true }
     });
 
     return new Response(JSON.stringify(project), { status: 201 });

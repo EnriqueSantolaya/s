@@ -113,7 +113,8 @@
                 acimutFijo: $cavanzada.acimut ?? null,
                 altura: bestPosition.altura,
                 acimut: bestPosition.acimut,
-                energia: bestPosition.energia
+                energia: bestPosition.energia,
+                obstacles: $obstacles
             })
         });
 
@@ -198,10 +199,12 @@
             <AlturaDisplay altura={bestPosition.altura} />
 
             {#if energiaFija !== null}
+            <div class="energy-summary">
                 <p>
-                    Energía mejor posición: {Math.round(bestPosition.energia / 1000)}W/m2 | 
-                    Energía posición método clásico: {Math.round(energiaFija / 1000)}W/m2
+                    Energía mejor posición: {Math.round(bestPosition.energia / 1000)}W/m² | 
+                    Energía posición método clásico: {Math.round(energiaFija / 1000)}W/m²
                 </p>
+            </div>
             {/if}
 
             {#if energiaPorMes.length > 0}
@@ -209,7 +212,7 @@
                     {#each energiaPorMes as item}
                         <div class="month-column">
                             <div class="month-name">
-                                {item.mes}
+                                {new Date(0, item.mes-1).toLocaleString('es-ES', { month: 'short' })}
                             </div>
 
                             <div class="bar-wrapper">
@@ -233,7 +236,6 @@
     {/if}
 
     {#if user && bestPosition}
-        <p>Logeado como <strong>{user.username}</strong></p>
         <button on:click={saveProject} class="save-button">Guardar proyecto</button>
     {:else if !user}
         <p>Inicia sesión para guardar el proyecto</p>
@@ -242,40 +244,50 @@
 </div>
 
 <style>
-    .page {
+  .page {
     display: flex;
     flex-direction: column;
     height: calc(100vh - 40px);
-    padding: 6px;
+    padding: 12px;
     box-sizing: border-box;
+    background: linear-gradient(to bottom, #eaf7ff 0%, #ffffff 70%);
+    font-family: 'Poppins', system-ui, sans-serif;
   }
   /* Navegación superior */
-  .top-nav {  
+  .top-nav {
     display: flex;
     justify-content: center;
     gap: 60px;
-  }
+    margin-bottom: 16px;
+}
 
   .nav-circle {
-    width: 80px;
-    height: 60px;
+    width: 90px;
+    height: 64px;
     border-radius: 50%;
-    border: 1px solid black;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    text-align: center;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.2;
-
     user-select: none;
+
+    background: white;
+    border: 1px solid rgba(15, 23, 42, 0.15);
+    color: #0f172a;
+
+    transition: all 0.2s ease;
   }
 
   /* Círculos clicables */
   .nav-circle.clickable {
     cursor: pointer;
+  }
+  .nav-circle.clickable:hover {
+    background: #f8fafc;
+    transform: translateY(-2px);
   }
 
   button.nav-circle {
@@ -284,34 +296,59 @@
     margin: 0;
     outline: none;
     border: 1px solid black;
-
     width: 80px;
     height: 60px;
     border-radius: 50%;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     font-family: inherit;
     font-size: 14px;
     line-height: 1.2;
     color: inherit;
   }
+  button.nav-circle:focus {
+    outline: none;
+  }
 
+  /* Contenedor principal de resultados */
   .results-wrapper {
     display: flex;
     flex-direction: column;
-    align-items: center; 
+    align-items: center;
     text-align: center;
+    width: 100%;
+  }
+  .results-wrapper h2 {
+    margin: 0;
+    margin-bottom: 3px;
+    font-size: 1.5rem;
+    color: #0f172a;
+    font-weight: 600;
   }
 
   .results-container {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 700px;
+    margin-top: 16px;
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 24px;
     align-items: center;
-    margin-top: 20px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+  } 
+
+  .energy-summary {
+    background: white;
+    border: 1px solid #0f172a; 
+    border-radius: 12px;        
+    padding: 16px;            
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(15,23,42,0.08);
   }
 
   .horizontal-table {
@@ -319,7 +356,6 @@
     justify-content: center;
     align-items: flex-end;
     gap: 14px;
-    margin-top: 35px;
     padding: 10px 0;
   }
 
@@ -334,6 +370,7 @@
   .month-name {
     margin-bottom: 6px;
     font-weight: 500;
+    color: #0f172a;
   }
 
   .bar-wrapper {
@@ -341,29 +378,40 @@
     width: 18px;
     background: #f1f1f1;
     border: 1px solid #bbb;
+    border-radius: 8px;
     display: flex;
     align-items: flex-end;
+    overflow: hidden;
   }
 
   .energy-bar {
     width: 100%;
-    background: linear-gradient(
-        to top,
-        #4caf50,
-        #81c784
-    );
+    background: linear-gradient(to top, #fde047, #fef08a);
+    transition: height 0.6s ease-out;
+    border-radius: 6px 6px 0 0;
   }
 
   .energy-label {
     margin-top: 6px;
     font-size: 12px;
-    color: #333;
+    color: #0f172a;
   }
 
   .save-button {
     margin-top: 10px;
-    padding: 8px 16px;
-    font-size: 14px;
+    margin-bottom: 10px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    background: #fde047;
+    border: 1px solid #facc15;
+    border-radius: 12px;
     cursor: pointer;
+    transition: all 0.2s ease;
+  } 
+
+  .save-button:hover {
+    background: #facc15;
+    transform: translateY(-1px);
   }
 </style>

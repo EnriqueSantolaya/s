@@ -3,3 +3,13 @@ html, body {
   padding: 0;
   height: 100%;
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+:root {
+  --sky-100: #eaf7ff;
+  --sky-200: #cfefff;
+  --sun-400: #fde047;
+  --sun-500: #facc15;
+  --text-main: #0f172a;
+}
