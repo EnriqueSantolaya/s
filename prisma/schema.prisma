@@ -26,8 +26,11 @@ model Project {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
 
+  name      String   @default("Proyecto")
+
   // Parameters
   latitud   Float
+  longitud  Float?
   meses     Int[]
   alturaFija Int?
   acimutFijo Int?

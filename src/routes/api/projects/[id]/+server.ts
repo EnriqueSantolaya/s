@@ -1,30 +1,44 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { prisma } from '$lib/server/prisma';
+import jwt from 'jsonwebtoken';
 
-// GET /api/projects/:id
-export const GET: RequestHandler = async ({ params }) => {
-    const project = await prisma.project.findUnique({
-        where: { id: params.id }
+const JWT_SECRET = process.env.JWT_SECRET!;
+
+export const DELETE: RequestHandler = async ({ params, cookies }) => {
+    const token = cookies.get('auth');
+
+    if (!token) {
+        return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
+    }
+
+    let userId: string;
+    try {
+        const payload = jwt.verify(token, JWT_SECRET) as { userId: string };
+        userId = payload.userId;
+    } catch {
+        return new Response(JSON.stringify({ error: 'Token inválido' }), { status: 401 });
+    }
+
+    const projectId = params.id;
+
+    // Verificamos que el proyecto pertenece al usuario
+    const project = await prisma.project.findFirst({
+        where: {
+            id: projectId,
+            userId
+        }
     });
 
-    if (!project) return new Response(JSON.stringify({ error: 'Proyecto no encontrado' }), { status: 404 });
-    return new Response(JSON.stringify(project), { status: 200 });
-};
+    if (!project) {
+        return new Response(
+            JSON.stringify({ error: 'Proyecto no encontrado' }),
+            { status: 404 }
+        );
+    }
 
-// PUT /api/projects/:id 
-export const PUT: RequestHandler = async ({ params, request }) => {
-    const data = await request.json();
-
-    const updated = await prisma.project.update({
-        where: { id: params.id },
-        data
+    await prisma.project.delete({
+        where: { id: projectId }
     });
 
-    return new Response(JSON.stringify(updated), { status: 200 });
-};
-
-// DELETE /api/projects/:id
-export const DELETE: RequestHandler = async ({ params }) => {
-    await prisma.project.delete({ where: { id: params.id } });
     return new Response(null, { status: 204 });
 };

@@ -44,6 +44,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     }
 
     const {
+        name,
         latitud,
         meses,
         alturaFija,
@@ -64,6 +65,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     const project = await prisma.project.create({
         data: {
             userId,
+            name: name?.trim() || 'Proyecto',
             latitud,
             meses,
             alturaFija: alturaFija ?? null,
@@ -74,13 +76,13 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
             obstacles: {
                 create: Array.isArray(obstacles)
                     ? obstacles.map((o: any) => ({
-                            name: o.name,
-                            distancia: o.distancia,
-                            alturaFisica: o.alturaFisica,
-                            acimutCentro: o.acimutCentro,
-                            anchoFactor: o.anchoFactor,
-                            type: o.type
-                        }))
+                          name: o.name,
+                          distancia: o.distancia,
+                          alturaFisica: o.alturaFisica,
+                          acimutCentro: o.acimutCentro,
+                          anchoFactor: o.anchoFactor,
+                          type: o.type
+                      }))
                     : []
             }
         },

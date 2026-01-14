@@ -3,6 +3,7 @@
     import { configAvanzadaStore } from '$lib/stores/configAvanzada';
     import { onMount } from 'svelte';
     import { latitudStore } from '$lib/stores/latitud';
+    import TopNav from '$lib/components/TopNav.svelte';
 
     let altura: number | null = null;
     let acimut: number | null = null;
@@ -10,6 +11,7 @@
     let meses: number[] | null = null;
     let initialized = false;
     let errorMessage: string | null = null;
+    let lastChanged: 'altura' | 'acimut' | null = null;
 
     const mesesArray = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
@@ -32,11 +34,11 @@
             acimut = values.acimut;
             meses = values.meses;
             if (meses && meses.length > 0) {
-                mesesInput = mesesArray
-                    .filter((_, index) => !meses!.includes(index + 1)) // Excluimos los meses seleccionados
-                    .join(', '); // Unimos los meses no seleccionados en una cadena
+                 mesesInput = meses
+                  .map(m => mesesArray[m - 1])
+                  .join(', ');
             } else {
-                mesesInput = ''; // Si no hay meses guardados, iniciamos con cadena vacía
+                mesesInput = mesesArray.join(', ');
             }
 
             initialized = true;
@@ -45,86 +47,76 @@
     });
 
     function next() {
-        goto('/resultado');
+      goto('/resultado');
     }
 
     function toggleMonth(mes: string) {
-        const mesNumber = mesesArray.indexOf(mes) + 1;
+      let activos = mesesInput
+        ? mesesInput.split(',').map(m => m.trim())
+        : [];
 
-        // Si el mes está seleccionado, lo deseleccionamos
-        if (mesesInput.includes(mes)) {
-            mesesInput = mesesInput
-                .split(',')
-                .map(m => m.trim())  // Separar por coma
-                .filter(m => m !== mes)  // Filtrar el mes
-                .join(',');  // Unir de nuevo
-        } else {
-            // Si no está seleccionado, lo agregamos
-            mesesInput = mesesInput
-                ? `${mesesInput}, ${mes}`  // Si ya hay meses, añadir el nuevo
-                : mes;  // Si no, solo asignamos el mes
-        }
+      if (activos.includes(mes)) {
+          // Desactivar
+          activos = activos.filter(m => m !== mes);
+      } else {
+          // Activar
+          activos.push(mes);
+      }
+
+      activos = mesesArray.filter(m => activos.includes(m));
+      mesesInput = activos.join(', ');
     }
 
     $: if (initialized) {
-        // Convertimos mesesInput → meses
-        const mesesCalculados = mesesInput
-            ? mesesArray
-                .filter(m => !mesesInput.includes(m))
-                .map(m => mesesArray.indexOf(m) + 1)
-            : null;
+      const activos = mesesInput
+        ? mesesInput
+          .split(',')
+          .map(m => m.trim())
+          .filter(Boolean)
+          .map(m => mesesArray.indexOf(m) + 1)
+        : [];
 
-        configAvanzadaStore.setConfig({
-            altura,
-            acimut,
-            meses: mesesCalculados
-        });
+      configAvanzadaStore.setConfig({
+        altura,
+        acimut,
+        meses: activos.length === 12 ? null : activos
+      });
     }
 
-    $: if (acimut !== null) {
-        acimut = Math.max(-180, Math.min(180, acimut));
-    }
-    $: if (altura !== null) {
-        altura = Math.max(0, Math.min(90, altura));
-    }
+    $: if (altura !== null && lastChanged === 'altura') {
+      altura = Math.max(0, Math.min(90, altura));
+      acimut = null;
+      lastChanged = null;
+  }
+      $: if (acimut !== null && lastChanged === 'acimut') {
+      acimut = Math.max(-180, Math.min(180, acimut));
+      altura = null;
+      lastChanged = null;
+  }
 </script>
 
 <div class="page">
   <!-- Navegación superior -->
-  <div class="top-nav">
-    <button
-      type="button"
-      class="nav-circle clickable"
-      on:click={() => goto('/location')}
-    >
-      Localización
-    </button>
-
-    <button
-      type="button"
-      class="nav-circle clickable"
-      on:click={() => goto('/obstacles')}
-    >
-      Obstáculos
-    </button>
-
-    <div class="nav-circle active">
-      C. Avanzada
-    </div>
-  </div>
+  <TopNav active="cavanzada" />
 
   <h2>Configuración Avanzada</h2>
 
   <div class="inputs-container">
     <!-- Input Acimut -->
     <div class="input-group">
-      <input
-        type="number"
-        bind:value={acimut}
-        placeholder="Fijar Acimut"
-        min="-180"
-        max="180"
-      />
+      <div class="input-with-label">
+        <div class="value-label">
+          Acimut
+        </div>
+        <input
+          type="number"
+          bind:value={acimut}
+          placeholder="Fijar Acimut"
+          min="-180"
+          max="180"
+          on:input={() => lastChanged = 'acimut'}
+        />
+      </div>
       <div class="arrow-container">
         <svg
         width="80"
@@ -153,13 +145,19 @@
 
     <!-- Input Altura -->
     <div class="input-group">
+      <div class="input-with-label">
+        <div class="value-label">
+          Altura
+        </div>
       <input
           type="number"
           bind:value={altura}
           placeholder="Fijar Altura"
           min="0"
           max="90"
+          on:input={() => lastChanged = 'altura'}
       />
+      </div>
 
       <div class="altura-container">
         <svg width="120" height="80" viewBox="0 0 120 80">
@@ -194,7 +192,7 @@
   </div>
 
   <!-- Selección de meses -->
-  <p class="months-title">Seleccionar meses de inactividad</p>
+  <p class="months-title">Seleccionar meses de actividad</p>
 
   <div class="months-container">
     {#each mesesArray as mes, index}
@@ -234,72 +232,6 @@
     font-family: 'Poppins', system-ui, sans-serif;
   }
 
-  /* Navegación superior */
-  .top-nav {
-    display: flex;
-    justify-content: center;
-    gap: 60px;
-    margin-bottom: 16px;
-  }
-
-  /* Estilo de los botones de navegación superior */
-  .nav-circle {
-    width: 90px;
-    height: 64px;
-    border-radius: 50%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 13px;
-    line-height: 1.2;
-    user-select: none;
-
-    background: white;
-    border: 1px solid rgba(15, 23, 42, 0.15);
-    color: #0f172a;
-
-    transition: all 0.2s ease;
-  }
-
-  .nav-circle.clickable {
-    cursor: pointer;
-  }
-  .nav-circle.clickable:hover {
-    background: #f8fafc;
-    transform: translateY(-2px);
-  }
-
-  .nav-circle.active {
-    font-weight: 600;
-    background: #fde047;
-    border-color: #facc15;
-    box-shadow: 0 4px 10px rgba(250, 204, 21, 0.4);
-  }
-
-  button.nav-circle {
-    background: none;
-    padding: 0;
-    margin: 0;
-    outline: none;
-    border: 1px solid black;
-    width: 80px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: inherit;
-    font-size: 14px;
-    line-height: 1.2;
-    color: inherit;
-  }
-
-  button.nav-circle:focus {
-    outline: none;
-  }
-
   h2 {
     text-align: center;
     margin: 8px 0 20px;
@@ -330,6 +262,20 @@
     gap: 24px;
   }
 
+  .input-with-label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .value-label {
+    height: 18px;       
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-align: left;
+    margin-left: 8px;
+  }
+
   .input-group input {
     padding: 10px 12px;
     font-size: 0.95rem;
@@ -342,8 +288,7 @@
     border-color: #facc15;
   }
 
-  .arrow-container,
-  .altura-container {
+  .arrow-container {
     width: 100px;
     height: 100px;
 
@@ -371,8 +316,9 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    max-width: 600px;
+    margin: 0 auto 24px;
     gap: 10px;
-    margin-bottom: 24px;
   }
 
   .month-panel {

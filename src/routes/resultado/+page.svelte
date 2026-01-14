@@ -1,19 +1,23 @@
 <script lang="ts">
     import { configAvanzadaStore } from '$lib/stores/configAvanzada';
     import { latitudStore } from '$lib/stores/latitud';
+    import { longitudStore } from '$lib/stores/longitud';
     import { obstaclesStore } from '$lib/stores/obstacles';
     import { onMount } from 'svelte';
     import { elevacionPlacaStore } from '$lib/stores/elevacionPlaca';
     import { goto } from '$app/navigation';
+    import TopNav from '$lib/components/TopNav.svelte';
     import AcimutDisplay from '$lib/components/AcimutDisplay.svelte';
     import AlturaDisplay from '$lib/components/AlturaDisplay.svelte';
     
     const cavanzada = configAvanzadaStore;
     const latitud = latitudStore;
+    const longitud = longitudStore;
     const obstacles = obstaclesStore;
     const elevacionPlaca = elevacionPlacaStore;
 
     let user: { id: string; username: string } | null = null;
+    let projectName = '';
 
     // Resultado de mejor posición
     let bestPosition: { altura: number; acimut: number; energia: number } | null = null;
@@ -107,7 +111,9 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                name: projectName,
                 latitud: $latitud,
+                longitud: $longitud,
                 meses: $cavanzada.meses ?? [],
                 alturaFija: $cavanzada.altura ?? null,
                 acimutFijo: $cavanzada.acimut ?? null,
@@ -162,31 +168,7 @@
 
 <div class="page">
   <!-- Navegación superior -->
-  <div class="top-nav">
-    <button
-      type="button"
-      class="nav-circle clickable"
-      on:click={() => goto('/location')}
-    >
-      Localización
-    </button>
-
-    <button
-      type="button"
-      class="nav-circle clickable"
-      on:click={() => goto('/obstacles')}
-    >
-      Obstáculos
-    </button>
-
-    <button
-      type="button"
-      class="nav-circle clickable"
-      on:click={() => goto('/cavanzada')}
-    >
-      C. Avanzada
-    </button>
-  </div>
+    <TopNav active="resultado" />
 
   <div class="results-wrapper">
     <h2>Resultados</h2>
@@ -236,6 +218,12 @@
     {/if}
 
     {#if user && bestPosition}
+        <input
+            type="text"
+            placeholder="Nombre del proyecto"
+            bind:value={projectName}
+            class="project-name-input"
+        />
         <button on:click={saveProject} class="save-button">Guardar proyecto</button>
     {:else if !user}
         <p>Inicia sesión para guardar el proyecto</p>
@@ -395,6 +383,21 @@
     margin-top: 6px;
     font-size: 12px;
     color: #0f172a;
+  }
+
+  .project-name-input {
+    margin-top: 12px;
+    padding: 10px 14px;
+    width: 260px;
+    border-radius: 10px;
+    border: 1px solid rgba(15, 23, 42, 0.2);
+    font-size: 0.95rem;
+    text-align: center;
+  }
+
+  .project-name-input:focus {
+    outline: none;
+    border-color: #facc15;
   }
 
   .save-button {

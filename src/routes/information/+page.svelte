@@ -31,39 +31,64 @@
         producida puede alejarse significativamente de la realidad. El enfoque de esta aplicación supera estas limitaciones
         al ofrecer un análisis personalizado y mucho más preciso para cada ubicación.
     </p>
-
-    <h5>Explicación Términos</h5>
-    <li>
-        <strong>latitud</strong> : La latitud geográfica del lugar donde se instalarán los paneles solares,
+    
+    <h5>Explicación de términos</h5>
+    <ul class="terms-list">
+      <li>
+        <strong>latitud:</strong> La latitud geográfica del lugar donde se instalarán los paneles solares,
         medida en grados. La latitud influye en la trayectoria del sol a lo largo del año y, por tanto, en la cantidad de 
         radiación solar recibida.
-    </li>
-    <li>
+      </li>
+      <li>
         <strong>Acimut:</strong> Ángulo horizontal que indica la dirección hacia la que apunta el panel solar, medido en grados
         desde el sur (0°) en sentido horario. Por ejemplo, 90° corresponde al este y -90° al oeste.
-    </li>
-    <li>
+      </li>
+      <li>
         <strong>Altura:</strong> Ángulo vertical que indica la inclinación del panel solar respecto al suelo, medida en grados.
         Una altura de 0° significa que el panel está completamente horizontal, mientras que 90° indica una posición vertical.
-    </li>
-    <li>
+      </li>
+      <li>
         <strong>Meses de no funcionamiento:</strong> Meses del año en los que el sistema fotovoltaico no estará operativo,
         ya sea por mantenimiento, condiciones climáticas adversas u otras razones. Estos meses se excluyen del cálculo de
         la orientación e inclinación óptimas del panel solar.
-    </li>
+      </li>
+    </ul>
 
     <h5>Instrucciones de uso de la aplicación</h5>
-    <p>
-        Para utilizar la aplicación, primero navega a la sección de localización e ingresa la latitud del lugar donde se 
-        instalarán los paneles solares. A continuación, puedes introducir obstáculos que puedan proyectar sombras sobre 
-        los paneles, como edificios o árboles, especificando su posición, distancia, altura, el tipo y el factor de anchura, 
-        que representá la relación entre la anchura y la altura del obstáculo. Después se continua a la sección de configuración 
-        avanzada, donde puedes definir restricciones en la orientación (acimut) e inclinación (altura) de los paneles, así como 
-        seleccionar los meses en los que el sistema no funcionará. Finalmente, selecciona la opción para calcular la mejor 
-        posición de los paneles solares. La aplicación procesará los datos y te mostrará la orientación e inclinación óptimas, 
-        junto con una comparación con una instalación realizada por el método clásico y una estimación de la energía generada a 
-        lo largo de los meses seleccionados. Por último, si tienes una cuenta, puedes guardar el proyecto para futuras referencias.
-    </p>
+    <ol class="instructions-list">
+      <li>
+        <strong>Ingresar la ubicación:</strong> Navega a la sección de localización e ingresa la <strong>latitud</strong> del lugar donde se instalarán los paneles solares.
+      </li>
+      <li>
+        <strong>Definir obstáculos:</strong> Introduce los obstáculos que puedan proyectar sombras sobre los paneles (edificios, árboles, etc.), especificando:
+        <ul>
+          <li>Posición</li>
+          <li>Distancia</li>
+          <li>Altura</li>
+          <li>Tipo de obstáculo</li>
+          <li>Factor de anchura (relación entre anchura y altura)</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Configurar restricciones avanzadas:</strong> En la sección de configuración avanzada se puede definir:
+        <ul>
+          <li>Restricciones en <strong>orientación (acimut)</strong> e <strong>inclinación (altura)</strong> de los paneles</li>
+          <li>Meses de funcionamiento del sistema</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Calcular la mejor posición:</strong> Haz clic en la opción para calcular la posición óptima de los paneles solares. La aplicación mostrará:
+        <ul>
+          <li>Orientación e inclinación óptimas</li>
+          <li>Comparación con el método clásico</li>
+          <li>Estimación de energía generada durante los meses seleccionados</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Guardar proyecto:</strong> Si tienes una cuenta, puedes guardar tu proyecto para futuras referencias.
+      </li>
+    </ol>
+
     </div>
 </div>
 
@@ -137,9 +162,36 @@
     margin-bottom: 16px;
   }
 
-  li {
-    max-width: 700px;
+  .terms-list {
+    margin: 0;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+  }
+
+  .terms-list li {
+    list-style-position: outside;
     margin-bottom: 12px;
   }
+
+  .instructions-list {
+  margin: 0;
+  padding-left: 1.4rem; 
+}
+
+.instructions-list li {
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.instructions-list li ul {
+  list-style-type: disc;
+  margin-top: 8px;
+  margin-bottom: 0;
+  padding-left: 1.2rem;
+}
+
+.instructions-list li ul li {
+  margin-bottom: 6px;
+}
 </style>
 

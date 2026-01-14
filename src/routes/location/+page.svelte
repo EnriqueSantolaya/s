@@ -3,71 +3,85 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { latitudStore } from '$lib/stores/latitud';
+  import { longitudStore } from '$lib/stores/longitud';
   import { get } from 'svelte/store';
+  import TopNav from '$lib/components/TopNav.svelte';
 
   let latitud: number | null = get(latitudStore);
-  let longitud: number | null = null;
+  let longitud: number | null = get(longitudStore);
   let map: any;
-  let latitudMapa = 41.6488;
-  let longitudMapa = -0.8891;
+  let marker: any = null;
+  let latitudPorDefecto  = 41.6488;
+  let longitudPorDefecto  = -0.8891;
 
   onMount(async () => {
     const L = await import('leaflet');
     L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/';
 
-    map = L.map('map').setView([latitudMapa, longitudMapa], 13);
+    const centroLat = (latitud !== null && longitud !== null) ? latitud : latitudPorDefecto;
+    const centroLng = (latitud !== null && longitud !== null) ? longitud : longitudPorDefecto;
+
+    map = L.map('map').setView([centroLat, centroLng], 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    const marker = L.marker([latitudMapa, longitudMapa]).addTo(map);
+    if (latitud === null && longitud === null) {
+      latitud = latitudPorDefecto;
+      longitud = longitudPorDefecto;
+      latitudStore.set(latitud);
+      longitudStore.set(longitud);
+
+      marker = L.marker([latitud, longitud]).addTo(map);
+
+    } else if (latitud !== null && longitud !== null) {
+      marker = L.marker([latitud!, longitud!]).addTo(map);
+    } else {
+      marker = null;
+    }
 
     map.on('click', (e: L.LeafletMouseEvent) => {
       const lat = e.latlng.lat;
       const lng = e.latlng.lng;
-      marker.setLatLng([lat, lng]);
-      latitudMapa = lat;
-      longitudMapa = lng;
+      if (!marker) {
+        marker = L.marker([lat, lng]).addTo(map);
+      } else {
+        marker.setLatLng([lat, lng]);
+      }
       latitud = lat;
-      if (latitud !== null) latitudStore.set(latitud);
+      longitud = lng;
+      latitudStore.set(latitud);
+      longitudStore.set(longitud);
     });
 
     // Esperar un tick para que el contenedor tenga tamaño real
     setTimeout(() => {
-      map.invalidateSize(); // Esto fuerza a Leaflet a recalcular los tiles
+      map.invalidateSize(); 
     }, 100);
   });
+
+  function onLatitudInput() {
+    latitudStore.set(latitud!);
+
+    longitud = null;
+    longitudStore.set(null as any);
+
+    if (marker) {
+      map.removeLayer(marker);
+      marker = null;
+    }
+  }
 </script>
 
 <div class="page">
 
   <!-- Navegación superior -->
-  <div class="top-nav">
-    <div class="nav-circle active">
-      Localización
-    </div>
-
-    <button
-      type="button"
-      class="nav-circle clickable"
-      on:click={() => goto('/obstacles')}
-    >
-      Obstáculos
-    </button>
-
-    <button
-      type="button"
-      class="nav-circle clickable"
-      on:click={() => goto('/cavanzada')}
-    >
-      C. Avanzada
-    </button>
-  </div>
+  <TopNav active="localizacion" />
 
   <div class="container">
     <h2>Selecciona en el mapa o elige la latitud</h2>
-    <p>Pulsa y arrastra para moverte en el mapa, y haz click para seleccionar la localización</p>
+    <p>Pulsa y arrastra para moverte en el mapa, haz click para seleccionar la localización</p>
     
     <!-- Map Container -->
     <div id="map" style="height: 400px; width: 80%; border: 1px solid black;"></div>
@@ -81,6 +95,7 @@
         bind:value={latitud} 
         step="any" 
         placeholder="Introduce la latitud"
+        on:input={onLatitudInput}
       />
     </div>
 
@@ -102,56 +117,6 @@
       #eaf7ff 0%,
       #ffffff 70%
     );
-
-    font-family: 'Poppins', system-ui, sans-serif;
-  }
-
-  /* Navegación superior */
-  .top-nav {  
-    display: flex;
-    justify-content: center;
-    gap: 60px;
-    margin-bottom: 16px;
-  }
-
-  .nav-circle {
-    width: 90px;
-    height: 64px;
-    border-radius: 50%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-    font-size: 13px;
-    line-height: 1.2;
-
-    user-select: none;
-
-    background: white;
-    border: 1px solid rgba(15, 23, 42, 0.15);
-    color: #0f172a;
-
-    transition: all 0.2s ease;
-  }
-
-  /* Círculos clicables */
-  .nav-circle.clickable {
-    cursor: pointer;
-  }
-  .nav-circle.clickable:hover {
-    background: #f8fafc;
-    transform: translateY(-2px);
-  }
-
-  /* Círculo actual (no clicable) */
-  .nav-circle.active {
-    font-weight: 600;
-    background: #fde047;
-    border-color: #facc15;
-    box-shadow: 0 4px 10px rgba(250, 204, 21, 0.4);
-    cursor: default;
   }
 
   /* Estilos del mapa y contenedor */
@@ -165,7 +130,7 @@
     box-shadow:
       0 6px 20px rgba(15, 23, 42, 0.15);
 
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
 
   .container {
@@ -205,7 +170,7 @@
 
   input[type="number"] {
     margin-top: 6px;
-    padding: 10px 12px;
+    padding: 6px 12px;
     font-size: 0.9rem;
 
     border-radius: 10px;

@@ -4,6 +4,7 @@
   import { elevacionPlacaStore } from '$lib/stores/elevacionPlaca';
   import type { Obstacle } from '$lib/obstacles';
   import { onMount } from 'svelte';
+  import TopNav from '$lib/components/TopNav.svelte';
 
   let newNombre = '';
   let newType: 'tree' | 'mountain' | 'building' | 'wall' | 'custom' = 'wall'; // Tipo de obstáculo
@@ -191,27 +192,7 @@
 <div class="page">
 
   <!-- Navegación superior -->
-  <div class="top-nav">
-    <button
-      type="button"
-      class="nav-circle clickable"
-      on:click={() => goto('/location')}
-    >
-      Localización
-    </button>
-
-    <div class="nav-circle active">
-      Obstáculos
-    </div>
-
-    <button
-      type="button"
-      class="nav-circle clickable"
-      on:click={() => goto('/cavanzada')}
-    >
-      C. Avanzada
-    </button>
-  </div>
+  <TopNav active="obstacles" />
 
   <!-- Círculo superior -->
   <div class="top-center">
@@ -247,18 +228,16 @@
         </div>
         {/each}
       </div>
-
-      
-
-      <div class="elevation-input">
-        <label>Elevación placa</label>
-        <input
-          type="number"
-          min="0"
-          bind:value={$elevacionPlacaStore}
-        />
-      </div>
     </div>
+  </div>
+
+  <div class="elevation-input">
+    <label>Elevación placa(m): </label>
+    <input
+      type="number"
+      min="0"
+      bind:value={$elevacionPlacaStore}
+    />
   </div>
 
   <!-- Zona principal -->
@@ -288,27 +267,33 @@
           </button>
         </div>
 
-        <ul class="obstacles-list">
-          {#each $obstaclesStore as obs, index}
-            <li class="obstacle-item">
-              <button
-                type="button"
-                class="obstacle-button"
-                on:click={() => editObstacle(obs, index)}
-              >
-                <span>{obs.name} ({obs.type})</span>
-              </button>
+        {#if $obstaclesStore.length === 0}
+          <div class="empty-list">
+            No hay obstáculos añadidos
+          </div>
+        {:else}
+          <ul class="obstacles-list">
+            {#each $obstaclesStore as obs, index}
+              <li class="obstacle-item">
+                <button
+                  type="button"
+                  class="obstacle-button"
+                  on:click={() => editObstacle(obs, index)}
+                >
+                  <span>{obs.name} ({obs.type})</span>
+                </button>
 
-              <button
-                type="button"
-                class="delete-btn"
-                on:click={() => removeObstacle(index)}
-              >
-                ✕
-              </button>
-            </li>
-          {/each}
-        </ul>
+                <button
+                  type="button"
+                  class="delete-btn"
+                  on:click={() => removeObstacle(index)}
+                >
+                  ✕
+                </button>
+              </li>
+            {/each}
+          </ul>
+        {/if}
       </div>
     </div>
   </div>
@@ -397,6 +382,7 @@
     </div>
   {/if}
 
+  <button class="bottom-button" on:click={() => goto('/cavanzada')}>Continuar</button>
 </div>
 
 <style>
@@ -404,7 +390,6 @@
     display: flex;
     flex-direction: column;
     height: calc(100vh - 40px);
-    flex: 1;
     padding: 12px;
     box-sizing: border-box;
 
@@ -413,54 +398,6 @@
       #eaf7ff 0%,
       #ffffff 70%
     );
-
-    font-family: 'Poppins', system-ui, sans-serif;
-  }
-
-  /* Navegación superior */
-  .top-nav {  
-    display: flex;
-    justify-content: center;
-    gap: 60px;
-    margin-bottom: 16px;
-  }
-
-  .nav-circle {
-    width: 90px;
-    height: 64px;
-    border-radius: 50%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 13px;
-    line-height: 1.2;
-    user-select: none;
-
-    background: white;
-    border: 1px solid rgba(15, 23, 42, 0.15);
-    color: #0f172a;
-
-    transition: all 0.2s ease;
-  }
-
-  /* Círculos clicables */
-  .nav-circle.clickable {
-    cursor: pointer;
-  }
-  .nav-circle.clickable:hover {
-    background: #f8fafc;
-    transform: translateY(-2px);
-  }
-
-  /* Círculo actual (no clicable) */
-  .nav-circle.active {
-    font-weight: 600;
-    background: #fde047;
-    border-color: #facc15;
-    box-shadow: 0 4px 10px rgba(250, 204, 21, 0.4);
-    cursor: default;
   }
 
   /* Círculo obstáculos */
@@ -471,6 +408,7 @@
   }
 
   .circle-wrapper {
+    width: 600px;
     position: relative;
     z-index: 1;
     display: inline-flex;
@@ -585,26 +523,16 @@
   }
 
   .elevation-input {
-    position: absolute;
-    top: calc(100% + 12px);
-    left: 50%;
-    transform: translateX(-50%);
-
-    background: white;
-    border: 1px solid rgba(15, 23, 42, 0.15);
+    position: relative;
     padding: 8px 10px;
     border-radius: 10px;
-
-    font-size: 12px;
     text-align: center;
-
-    z-index: 20; 
-    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.15);
   }
 
   .elevation-input input {
-    width: 90px;
+    width: 140px;
     padding: 6px;
+    margin-left: 12px;
     border-radius: 6px;
     border: 1px solid rgba(15, 23, 42, 0.2);
   }
@@ -654,8 +582,7 @@
     padding: 0;
     margin: 1px 0 0 0;
 
-    overflow-y: auto;
-    max-height: 280px;
+    min-height: 140px;
   }
 
   .obstacle-item {
@@ -675,7 +602,7 @@
     background-color: #f5f5f5;
   }
 
-  .obstacle-button {
+  .page .obstacle-button {
     flex: 1;
     background: none;
     border: none;
@@ -685,7 +612,7 @@
     font: inherit;
   }
 
-  .delete-btn {
+  .page .delete-btn {
     background: none;
     border: none;
     cursor: pointer;
@@ -693,7 +620,7 @@
     padding: 4px 6px;
   }
 
-  .add-btn {
+  .page .add-btn {
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -702,7 +629,7 @@
     font-size: 18px;
     cursor: pointer;
   }
-  .add-btn:hover {
+  .page .add-btn:hover {
     background: #facc15;
   }
 
@@ -837,7 +764,7 @@
     justify-content: center;
   }
 
-  .save-btn {
+  .page .save-btn {
     padding: 10px 20px;
     font-size: 14px;
     cursor: pointer;
@@ -849,26 +776,33 @@
     font-weight: 600;
   }
 
-  .save-btn:hover {
+  .page .save-btn:hover {
     background: #facc15;
   }
 
-  /* Reset visual del botón para que parezca un div */
-  button.nav-circle {
-    background: none;
-    padding: 0;
-    margin: 0;
-    outline: none;
+  .page .bottom-button {
+    align-self: center;
+    margin-top: auto;
+
+    padding: 12px 24px;
+    width: 220px;
+
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    font-size: 1rem;
+    font-weight: 600;
+
+    background: #fde047;
+    border: 1px solid #facc15;
+    border-radius: 12px;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
   }
 
-  /* Evita estilos raros al hacer focus/click */
-  button.nav-circle:focus {
-    outline: none;
-  }
-
-  /* Mantiene tipografía consistente */
-  button.nav-circle {
-    font-family: inherit;
-    color: inherit;
+  .page .bottom-button:hover {
+    background: #facc15;
+    transform: translateY(-1px);
   }
 </style>
