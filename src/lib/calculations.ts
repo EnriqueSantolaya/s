@@ -10,7 +10,7 @@ function rad2deg(rad: number): number {
     return rad * 180 / Math.PI;
 }
 
-export function calculateEnergyMoment(alturaP:number, acimutP:number, latitud:number, dia:number, hora:number, obstacles:Obstacle[] = []): number{
+export function calculateEnergyMoment(alturaP:number, acimutP:number, latitud:number, dia:number, hora:number, elevacionPlaca:number, obstacles:Obstacle[] = []): number{
     const declinS = deg2rad(23.5) * Math.sin( 2 * Math.PI * (284 + dia) / 365 );
     const angulo_horario = deg2rad( 15 * ( hora - 12 ));
 
@@ -25,7 +25,7 @@ export function calculateEnergyMoment(alturaP:number, acimutP:number, latitud:nu
         (Math.cos(alturaS) * Math.cos(deg2rad(latitud)));
     let acimutS = Math.atan2(sinAcimutS, cosAcimutS);
 
-    if (isBlockedByObstacle( rad2deg(alturaS), rad2deg(acimutS), obstacles)) {
+    if (isBlockedByObstacle( rad2deg(alturaS), rad2deg(acimutS), elevacionPlaca, obstacles)) {
         return 0;
     }
 
@@ -37,13 +37,13 @@ export function calculateEnergyMoment(alturaP:number, acimutP:number, latitud:nu
     return 1367 * fOrbital * extincion * Math.max(0, cosIncidencia);
 }
 
-export function calculateEnergyRange(alturaP:number, acimutP:number, latitud:number, diaInicio:number, diaFin:number, obstacles:Obstacle[] = [] ): number{
+export function calculateEnergyRange(alturaP:number, acimutP:number, latitud:number, diaInicio:number, diaFin:number, elevacionPlaca:number, obstacles:Obstacle[] = [] ): number{
     let energiaTotal = 0;
 
     for (let dia = diaInicio; dia <= diaFin; dia++) {
         for (let hora = 0; hora < 24; hora++) {
 
-            const energiaHora = calculateEnergyMoment(alturaP, acimutP, latitud, dia, hora, obstacles);
+            const energiaHora = calculateEnergyMoment(alturaP, acimutP, latitud, dia, hora, elevacionPlaca, obstacles);
 
             if (energiaHora > 0) energiaTotal += energiaHora;
         }
@@ -52,11 +52,11 @@ export function calculateEnergyRange(alturaP:number, acimutP:number, latitud:num
     return energiaTotal;
 }
 
-export function calculateEnergyYear(alturaP:number, acimutP:number, latitud:number, obstacles:Obstacle[] = []): number{
-    return calculateEnergyRange(alturaP, acimutP, latitud, 1, 365, obstacles);
+export function calculateEnergyYear(alturaP:number, acimutP:number, latitud:number, elevacionPlaca:number, obstacles:Obstacle[] = []): number{
+    return calculateEnergyRange(alturaP, acimutP, latitud, 1, 365, elevacionPlaca, obstacles);
 }
 
-function calculateEnergyMonth(alturaP:number, acimutP:number, latitud:number, mes:number, obstacles:Obstacle[] = []): number{
+function calculateEnergyMonth(alturaP:number, acimutP:number, latitud:number, mes:number, elevacionPlaca:number, obstacles:Obstacle[] = []): number{
     let diaInicio = 1;
 
     for (let m = 1; m < mes; m++){
@@ -65,15 +65,15 @@ function calculateEnergyMonth(alturaP:number, acimutP:number, latitud:number, me
 
     const diaFin = diaInicio + diasPorMes[mes - 1] - 1;
 
-    return calculateEnergyRange(alturaP, acimutP, latitud, diaInicio, diaFin, obstacles);
+    return calculateEnergyRange(alturaP, acimutP, latitud, diaInicio, diaFin, elevacionPlaca, obstacles);
 }
 
-export function calculateEnergyMonths(alturaP: number, acimutP: number, latitud: number, meses: number[], obstacles:Obstacle[] = []): number {
+export function calculateEnergyMonths(alturaP: number, acimutP: number, latitud: number, meses: number[], elevacionPlaca: number, obstacles:Obstacle[] = []): number {
     let energiaTotal = 0;
 
     for (const mes of meses) {
         if (mes < 1 || mes > 12) continue; 
-        energiaTotal += calculateEnergyMonth(alturaP, acimutP, latitud, mes, obstacles);
+        energiaTotal += calculateEnergyMonth(alturaP, acimutP, latitud, mes, elevacionPlaca, obstacles);
     }
 
     return energiaTotal;
@@ -87,7 +87,7 @@ function getFirstDayOfMonth(mes: number): number {
     return dia;
 }
 
-export function calculateEnergyFirstDayOfMonths(alturaP: number, acimutP: number, latitud: number, meses: number[], obstacles: Obstacle[] = []) {
+export function calculateEnergyFirstDayOfMonths(alturaP: number, acimutP: number, latitud: number, meses: number[], elevacionPlaca: number, obstacles: Obstacle[] = []) {
     return meses
         .filter(m => m >= 1 && m <= 12)
         .map(mes => {
@@ -98,6 +98,7 @@ export function calculateEnergyFirstDayOfMonths(alturaP: number, acimutP: number
                 latitud,
                 dia,
                 dia,
+                elevacionPlaca,
                 obstacles
             );
 

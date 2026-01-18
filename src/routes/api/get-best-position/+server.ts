@@ -12,11 +12,12 @@ export async function POST({ request }) {
 
   const body = await request.json();
 
-  const { latitud, altura, acimut, meses, obstacles } = body as {
+  const { latitud, altura, acimut, meses, elevacionPlaca, obstacles } = body as {
     latitud: number;
     altura?: number;
     acimut?: number;
     meses?: number[];
+    elevacionPlaca: number;
     obstacles?: Obstacle[];
   };
 
@@ -34,6 +35,13 @@ export async function POST({ request }) {
     );
   }
 
+  if (elevacionPlaca !== undefined && Number.isNaN(elevacionPlaca)) {
+    return json(
+      { error: 'Invalid elevacion de placa' },
+      { status: 400 }
+    );
+  }
+
   if (altura !== undefined && acimut !== undefined) {
     return json(
       { error: 'Provide either altura or acimut, not both' },
@@ -44,8 +52,8 @@ export async function POST({ request }) {
   const positions = generatePositions(5, 5, altura, acimut);
 
   const results = meses && meses.length > 0
-    ? comparePositionsMonths(positions, latitud, meses, obstacles)
-    : comparePositionsYear(positions, latitud, obstacles);
+    ? comparePositionsMonths(positions, latitud, meses, elevacionPlaca, obstacles)
+    : comparePositionsYear(positions, latitud, elevacionPlaca, obstacles);
 
   const best = getBestPosition(results);
 

@@ -5,11 +5,12 @@ import { calculateEnergyFirstDayOfMonths } from '$lib/calculations.js';
 export async function POST({ request }) {
     const body = await request.json();
 
-    const { latitud, altura, acimut, meses, obstacles } = body as {
+    const { latitud, altura, acimut, meses, elevacionPlaca, obstacles } = body as {
         latitud: number;
         altura: number;
         acimut: number;
         meses: number[];
+        elevacionPlaca: number;
         obstacles?: Obstacle[];
     };
 
@@ -19,6 +20,13 @@ export async function POST({ request }) {
         acimut === undefined
     ) {
         return json({ error: 'Invalid input' }, { status: 400 });
+    }
+
+    if (elevacionPlaca !== undefined && Number.isNaN(elevacionPlaca)) {
+        return json(
+        { error: 'Invalid elevacion de placa' },
+        { status: 400 }
+        );
     }
 
     const mesesNormalizados =
@@ -31,6 +39,7 @@ export async function POST({ request }) {
         acimut,
         latitud,
         mesesNormalizados,
+        elevacionPlaca,
         obstacles
     );
 

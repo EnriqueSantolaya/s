@@ -11,12 +11,14 @@ export async function POST({ request }) {
   const {
     latitud,
     meses,
+    elevacionPlaca,
     obstacles,
     acimut: acimutBody,
     altura: alturaBody
   } = body as {
     latitud: number;
     meses?: number[];
+    elevacionPlaca: number;
     obstacles?: Obstacle[];
     acimut?: number;
     altura?: number;
@@ -26,6 +28,13 @@ export async function POST({ request }) {
   if (latitud === undefined || Number.isNaN(latitud)) {
     return json(
       { error: 'Invalid latitud' },
+      { status: 400 }
+    );
+  }
+
+  if (elevacionPlaca !== undefined && Number.isNaN(elevacionPlaca)) {
+    return json(
+      { error: 'Invalid elevacion de placa' },
       { status: 400 }
     );
   }
@@ -46,6 +55,7 @@ export async function POST({ request }) {
       acimut,
       latitud,
       meses,
+      elevacionPlaca,
       obstacles
     );
   } else {
@@ -53,6 +63,7 @@ export async function POST({ request }) {
       altura,
       acimut,
       latitud,
+      elevacionPlaca,
       obstacles
     );
   }

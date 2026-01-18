@@ -7,9 +7,10 @@ export type Obstacle = {
     type: 'tree' | 'mountain' | 'building' | 'wall' | 'custom';
 };
 
-export function isBlockedByObstacle(alturaS: number, acimutS: number, obstacles: Obstacle[]): boolean {
+export function isBlockedByObstacle(alturaS: number, acimutS: number, elevacionPlaca: number, obstacles: Obstacle[]): boolean {
     for (const obs of obstacles) {
-        const alturaAngular = Math.atan2(obs.alturaFisica, obs.distancia) * (180 / Math.PI);
+        const alturaEfectiva = Math.max(0, obs.alturaFisica - elevacionPlaca);
+        const alturaAngular = Math.atan2(alturaEfectiva, obs.distancia) * (180 / Math.PI);
         const anchoAngular = alturaAngular * obs.anchoFactor;
         const acimutMin = obs.acimutCentro - anchoAngular / 2;
         const acimutMax = obs.acimutCentro + anchoAngular / 2;
@@ -40,12 +41,12 @@ function getGeometricType(type: 'tree' | 'mountain' | 'building' | 'wall' | 'cus
     switch (type) {
         case 'tree':
         case 'mountain':
-            return 'triangle'; // Los árboles y montañas los representamos como triángulos
+            return 'triangle'; // Los árboles y montañas son triángulos
         case 'building':
         case 'wall':
         case 'custom':
-            return 'rectangle';  // Los edificios y paredes los representamos como rectángulos
+            return 'rectangle';  // Los edificios y paredes son rectángulos
         default:
-            return 'rectangle';  // Default por seguridad
+            return 'rectangle';  // Default
     }
 }

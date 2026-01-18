@@ -40,6 +40,7 @@
                     altura: $cavanzada.altura ?? undefined,
                     acimut: $cavanzada.acimut ?? undefined,
                     meses: $cavanzada.meses ?? undefined,
+                    elevacionPlaca: $elevacionPlaca ?? 0,
                     obstacles: $obstacles
                 })
             });
@@ -68,6 +69,7 @@
                     altura: $cavanzada.altura ?? undefined,
                     acimut: $cavanzada.acimut ?? undefined,
                     meses: $cavanzada.meses ?? undefined,
+                    elevacionPlaca: $elevacionPlaca ?? 0,
                     obstacles: $obstacles
                 })
             });
@@ -92,6 +94,7 @@
                     altura: bestPosition.altura,
                     acimut: bestPosition.acimut,
                     meses: $cavanzada.meses ?? undefined,
+                    elevacionPlaca: $elevacionPlaca ?? 0,
                     obstacles: $obstacles
                 })
             });
