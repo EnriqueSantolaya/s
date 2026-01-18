@@ -1,98 +1,110 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
-    import { configAvanzadaStore } from '$lib/stores/configAvanzada';
-    import { onMount } from 'svelte';
-    import { latitudStore } from '$lib/stores/latitud';
-    import TopNav from '$lib/components/TopNav.svelte';
+  import { goto } from '$app/navigation';
+  import { configAvanzadaStore } from '$lib/stores/configAvanzada';
+  import { onMount } from 'svelte';
+  import { latitudStore } from '$lib/stores/latitud';
+  import TopNav from '$lib/components/TopNav.svelte';
 
-    let altura: number | null = null;
-    let acimut: number | null = null;
-    let mesesInput: string = "";
-    let meses: number[] | null = null;
-    let initialized = false;
-    let errorMessage: string | null = null;
-    let lastChanged: 'altura' | 'acimut' | null = null;
+  let altura: number | null = null;
+  let inclinacion: number | null = null;
+  let acimut: number | null = null;
+  let mesesInput: string = "";
+  let meses: number[] | null = null;
+  let initialized = false;
+  let errorMessage: string | null = null;
+  let lastChanged: 'inclinación' | 'acimut' | null = null;
 
-    const mesesArray = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const mesesArray = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
-    const save = () => {
-        errorMessage = null;
-        if (latitudStore === null) {
-            errorMessage = 'Debes introducir una latitud antes de continuar.';
-            return;
-        }
-        if (acimut !== null && altura !== null) {
-            errorMessage = 'No puedes definir acimut y altura al mismo tiempo.';
-            return;
-        }
-        next();
-    };
+  const save = () => {
+      errorMessage = null;
+      if (latitudStore === null) {
+          errorMessage = 'Debes introducir una latitud antes de continuar.';
+          return;
+      }
+      if (acimut !== null && altura !== null) {
+          errorMessage = 'No puedes definir acimut y altura al mismo tiempo.';
+          return;
+      }
+      next();
+  };
 
-    onMount(() => {
-        const unsubscribe = configAvanzadaStore.subscribe(values => {
-            altura = values.altura;
-            acimut = values.acimut;
-            meses = values.meses;
-            if (meses && meses.length > 0) {
-                 mesesInput = meses
-                  .map(m => mesesArray[m - 1])
-                  .join(', ');
-            } else {
-                mesesInput = mesesArray.join(', ');
-            }
-
-            initialized = true;
-        });
-        unsubscribe(); 
-    });
-
-    function next() {
-      goto('/resultado');
-    }
-
-    function toggleMonth(mes: string) {
-      let activos = mesesInput
-        ? mesesInput.split(',').map(m => m.trim())
-        : [];
-
-      if (activos.includes(mes)) {
-          // Desactivar
-          activos = activos.filter(m => m !== mes);
+  onMount(() => {
+    const unsubscribe = configAvanzadaStore.subscribe(values => {
+      altura = values.altura;
+      inclinacion = altura !== null ? 90 - altura : null;
+      acimut = values.acimut;
+      meses = values.meses;
+      if (meses && meses.length > 0) {
+        mesesInput = meses
+        .map(m => mesesArray[m - 1])
+        .join(', ');
       } else {
-          // Activar
-          activos.push(mes);
+        mesesInput = mesesArray.join(', ');
       }
 
-      activos = mesesArray.filter(m => activos.includes(m));
-      mesesInput = activos.join(', ');
+      initialized = true;
+    });
+    unsubscribe(); 
+  });
+
+  function next() {
+    goto('/resultado');
+  }
+
+  function toggleMonth(mes: string) {
+    let activos = mesesInput
+      ? mesesInput.split(',').map(m => m.trim())
+      : [];
+
+    if (activos.includes(mes)) {
+        // Desactivar
+        activos = activos.filter(m => m !== mes);
+    } else {
+        // Activar
+        activos.push(mes);
     }
 
-    $: if (initialized) {
-      const activos = mesesInput
-        ? mesesInput
-          .split(',')
-          .map(m => m.trim())
-          .filter(Boolean)
-          .map(m => mesesArray.indexOf(m) + 1)
-        : [];
-
-      configAvanzadaStore.setConfig({
-        altura,
-        acimut,
-        meses: activos.length === 12 ? null : activos
-      });
-    }
-
-    $: if (altura !== null && lastChanged === 'altura') {
-      altura = Math.max(0, Math.min(90, altura));
-      acimut = null;
-      lastChanged = null;
+    activos = mesesArray.filter(m => activos.includes(m));
+    mesesInput = activos.join(', ');
   }
-      $: if (acimut !== null && lastChanged === 'acimut') {
-      acimut = Math.max(-180, Math.min(180, acimut));
-      altura = null;
-      lastChanged = null;
+
+  $: if (initialized) {
+    const activos = mesesInput
+      ? mesesInput
+        .split(',')
+        .map(m => m.trim())
+        .filter(Boolean)
+        .map(m => mesesArray.indexOf(m) + 1)
+      : [];
+
+    configAvanzadaStore.setConfig({
+      altura,
+      acimut,
+      meses: activos.length === 12 ? null : activos
+    });
   }
+
+  $: if (inclinacion !== null && lastChanged === 'inclinación') {
+    inclinacion = Math.max(0, Math.min(90, inclinacion));
+    altura = 90 - inclinacion;
+    acimut = null;
+    lastChanged = null;
+  }
+  $: if (acimut !== null && lastChanged === 'acimut') {
+    acimut = Math.max(-180, Math.min(180, acimut));
+    altura = null;
+    inclinacion = null;
+    lastChanged = null;
+  }
+  $: selectedMonthsCount = mesesInput
+    ? mesesInput.split(',').map(m => m.trim()).filter(Boolean).length
+    : 0;
+
+  $: monthsLabel =
+    selectedMonthsCount === 0 || selectedMonthsCount === 12
+      ? 'Todos los meses'
+      : `${selectedMonthsCount} meses seleccionados`;
 </script>
 
 <div class="page">
@@ -106,12 +118,12 @@
     <div class="input-group">
       <div class="input-with-label">
         <div class="value-label">
-          Acimut
+          Orientación (°)
         </div>
         <input
           type="number"
           bind:value={acimut}
-          placeholder="Fijar Acimut"
+          placeholder="Fijar Orientación"
           min="-180"
           max="180"
           on:input={() => lastChanged = 'acimut'}
@@ -134,7 +146,7 @@
         </text>
         <!-- Flecha -->
         {#if acimut !== null}
-            <g style="transform: rotate({(acimut ?? 0) + 180}deg); transform-origin: 50% 50%;">
+            <g style="transform: rotate({-(acimut ?? 0) + 180}deg); transform-origin: 50% 50%;">
                 <line x1="50" y1="80" x2="50" y2="20" stroke="black" stroke-width="4" />
                 <polygon points="50,10 42,25 58,25" fill="black" />
             </g>
@@ -147,21 +159,24 @@
     <div class="input-group">
       <div class="input-with-label">
         <div class="value-label">
-          Altura
+          Inclinación (°)
         </div>
       <input
           type="number"
-          bind:value={altura}
-          placeholder="Fijar Altura"
+          bind:value={inclinacion}
+          placeholder="Fijar Inclinación"
           min="0"
           max="90"
-          on:input={() => lastChanged = 'altura'}
+          on:input={() => lastChanged = 'inclinación'}
       />
       </div>
 
       <div class="altura-container">
         <svg width="120" height="80" viewBox="0 0 120 80">
-        {#if altura !== null}
+        {#if inclinacion !== null}
+          <!-- Origen de la placa -->
+          <circle cx="10" cy="60" r="2" fill="black" />
+
           <!-- Línea horizontal fija -->
           <line
             x1="10"
@@ -173,17 +188,16 @@
           />
 
           <!-- Línea inclinada -->
-          <g
-          style="transform: rotate({-altura}deg); transform-origin: 10px 60px;"
-          >
-          <line
+          <g style="transform: rotate({-inclinacion}deg); transform-origin: 10px 60px;">
+            <line
               x1="10"
               y1="60"
-              x2="100"
+              x2="90"
               y2="60"
-              stroke="black"
-              stroke-width="3"
-          />
+              stroke="#facc15"
+              stroke-width="4"
+              stroke-linecap="round"
+            />
           </g>
         {/if}
         </svg>
@@ -193,6 +207,7 @@
 
   <!-- Selección de meses -->
   <p class="months-title">Seleccionar meses de actividad</p>
+  <p class="months-info">{monthsLabel}</p>
 
   <div class="months-container">
     {#each mesesArray as mes, index}
@@ -309,7 +324,15 @@
     text-align: center;
     font-weight: 500;
     color: #0f172a;
-    margin-bottom: 10px;
+    margin-bottom: 1px;
+  }
+
+  .months-info {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #475569;
+    margin-top: 1px;
+    margin-bottom: 12px;
   }
 
   .months-container {
@@ -351,7 +374,7 @@
 
   .bottom-button {
     align-self: center;
-    margin-top: auto;
+    margin-top: 24px;
 
     padding: 12px 24px;
     width: 220px;

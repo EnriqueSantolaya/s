@@ -324,13 +324,13 @@
 
       <!-- Acimut central -->
       <div class="field">
-        <label>Acimut central</label>
+        <label>Posición relativa (º)</label>
         <input 
           type="number" 
             min="-180" 
             max="180" 
             step="1" 
-            placeholder="Acimut central" 
+            placeholder="Posición relativa" 
             bind:value={acimutCentro} 
             on:input={updateDragPositionFromInputs}
         />
@@ -338,13 +338,13 @@
 
       <!-- Distancia -->
       <div class="field">
-        <label>Distancia</label>
+        <label>Distancia (m)</label>
         <input type="number" min="0" placeholder="Distancia" bind:value={distancia} on:input={updateDragPositionFromInputs} />
       </div>
 
       <!-- Altura física -->
       <div class="field">
-        <label>Altura física</label>
+        <label>Altura física (m)</label>
         <input type="number" min="0" placeholder="Altura física" bind:value={alturaFisica} />
       </div>
 
@@ -416,7 +416,7 @@
     align-items: center;
 
     background: white;
-    padding: 16px;
+    padding: 24px;
     border-radius: 20px;
 
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
@@ -524,7 +524,8 @@
 
   .elevation-input {
     position: relative;
-    padding: 8px 10px;
+    margin-top: 12px;
+    margin-bottom: 20px;
     border-radius: 10px;
     text-align: center;
   }
@@ -558,7 +559,7 @@
 
     background: white;
     border-radius: 16px;
-    padding: 16px;
+    padding: 24px;
 
     box-shadow:
       0 10px 30px rgba(15, 23, 42, 0.12);
@@ -660,8 +661,8 @@
     flex-direction: column;
     gap: 12px;
 
-    box-shadow:
-      -10px 0 30px rgba(15, 23, 42, 0.15);
+    box-shadow: -10px 0 30px rgba(15, 23, 42, 0.15);
+    z-index: 1000;
   }
 
   .panel-header {
@@ -782,12 +783,11 @@
 
   .page .bottom-button {
     align-self: center;
-    margin-top: auto;
 
     padding: 12px 24px;
     width: 220px;
 
-    margin-top: 10px;
+    margin-top: 20px;
     margin-bottom: 10px;
 
     font-size: 1rem;

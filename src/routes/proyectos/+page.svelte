@@ -8,6 +8,8 @@
 
   let projects: any[] = [];
   let error: string | null = null;
+  let showDeleteModal = false;
+  let projectToDelete: any = null;
 
   async function fetchProjects() {
     try {
@@ -38,22 +40,35 @@
     goto('/cavanzada');
   }
 
-  async function deleteProject(id: string) {
-    const confirmed = confirm('¿Seguro que quieres borrar este proyecto?');
-    if (!confirmed) return;
+  function confirmDeleteProject(p: any) {
+    projectToDelete = p;
+    showDeleteModal = true;
+  }
 
-    const res = await fetch(`/api/projects/${id}`, {
-        method: 'DELETE'
+  async function handleDelete() {
+    if (!projectToDelete) return;
+
+    const res = await fetch(`/api/projects/${projectToDelete.id}`, {
+      method: 'DELETE'
     });
 
     if (!res.ok) {
-        const data = await res.json();
-        alert(data.error ?? 'Error al borrar el proyecto');
-        return;
+      const data = await res.json();
+      alert(data.error ?? 'Error al borrar el proyecto');
+    } else {
+      projects = projects.filter(p => p.id !== projectToDelete.id);
     }
 
-    projects = projects.filter(p => p.id !== id);
+    // cerrar modal
+    projectToDelete = null;
+    showDeleteModal = false;
   }
+
+  function cancelDelete() {
+    projectToDelete = null;
+    showDeleteModal = false;
+  }
+
 
   onMount(() => {
     fetchProjects();
@@ -86,7 +101,7 @@
 
               <button
                 class="delete-btn"
-                on:click|stopPropagation={() => deleteProject(p.id)}
+                on:click|stopPropagation={() => confirmDeleteProject(p)}
                 title="Eliminar proyecto"
               >
                 ×
@@ -99,6 +114,19 @@
           </li>
         {/each}
       </ul>
+    {/if}
+
+    {#if showDeleteModal && projectToDelete}
+      <div class="modal-backdrop">
+        <div class="modal">
+          <h3>¿Eliminar proyecto?</h3>
+          <p>Vas a eliminar <strong>{projectToDelete.name}</strong>. Esta acción no se puede deshacer.</p>
+          <div class="modal-buttons">
+            <button class="cancel-btn" on:click={cancelDelete}>Cancelar</button>
+            <button class="confirm-btn" on:click={handleDelete}>Borrar</button>
+          </div>
+        </div>
+      </div>
     {/if}
   </div>
 </div>
@@ -194,10 +222,79 @@
     opacity: 0.6;
     transition: opacity 0.2s, transform 0.1s;
   }
-
   .delete-btn:hover {
     opacity: 1;
     transform: scale(1.1);
+  }
+
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2);
+    animation: modalFade 0.2s ease-out;
+  }
+
+  .modal h3 {
+    margin-bottom: 12px;
+    color: #0f172a;
+  }
+
+  .modal p {
+    margin-bottom: 24px;
+    color: #475569;
+  }
+
+  .modal-buttons {
+    display: flex;
+    justify-content: space-around;
+    gap: 16px;
+  }
+
+  .cancel-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .cancel-btn:hover {
+    background: #f1f5f9;
+  }
+
+  .confirm-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    background: #ef4444;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .confirm-btn:hover {
+    background: #dc2626;
+  }
+
+  @keyframes modalFade {
+    from { transform: translateY(-10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
   }
 
   .error {

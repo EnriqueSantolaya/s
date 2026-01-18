@@ -11,29 +11,28 @@ function rad2deg(rad: number): number {
 }
 
 export function calculateEnergyMoment(alturaP:number, acimutP:number, latitud:number, dia:number, hora:number, obstacles:Obstacle[] = []): number{
-    // Mirar tests para ver si esta bien
     const declinS = deg2rad(23.5) * Math.sin( 2 * Math.PI * (284 + dia) / 365 );
     const angulo_horario = deg2rad( 15 * ( hora - 12 ));
 
     const sinAlturaS = Math.sin(declinS) * Math.sin(deg2rad(latitud)) + Math.cos(declinS) * Math.cos(deg2rad(latitud)) * Math.cos(angulo_horario);
     const alturaS = Math.asin(sinAlturaS);
-    if ( rad2deg(alturaS) <= 0.05 ) return 0;
+    if ( rad2deg(alturaS) <= 0.1 ) return 0;
 
-    const cosAcimutS = ( Math.sin(alturaS) * Math.sin(deg2rad(latitud)) - Math.sin(declinS) ) / ( Math.cos(alturaS) * Math.cos(deg2rad(latitud)) );
-    const cosA = Math.max(-1, Math.min(1, cosAcimutS));
-    let acimutS = Math.acos(cosA);
-    if (angulo_horario > 0) {
-       acimutS = -acimutS;
-    }
+    const sinAcimutS =
+        Math.cos(declinS) * Math.sin(angulo_horario) / Math.cos(alturaS);
+    const cosAcimutS =
+        (Math.sin(alturaS) * Math.sin(deg2rad(latitud)) - Math.sin(declinS)) /
+        (Math.cos(alturaS) * Math.cos(deg2rad(latitud)));
+    let acimutS = Math.atan2(sinAcimutS, cosAcimutS);
 
     if (isBlockedByObstacle( rad2deg(alturaS), rad2deg(acimutS), obstacles)) {
         return 0;
     }
 
-    const cosIncidencia = Math.sin(alturaS) * Math.sin(deg2rad(alturaP)) + Math.cos(alturaS) * Math.cos(deg2rad(alturaP)) * Math.cos(acimutS - deg2rad(acimutP));
+    const cosIncidencia = Math.sin(alturaS) * Math.sin(deg2rad(alturaP)) + Math.cos(alturaS) * Math.cos(deg2rad(alturaP)) * Math.cos(deg2rad(acimutP) - acimutS);
 
     const fOrbital = 1 + 0.033 * Math.cos( 2*Math.PI*dia / 365 );
-    const extincion = 1 / Math.sin(alturaS);
+    const extincion = Math.exp(-0.15 / Math.max(0.05, Math.sin(alturaS)));
 
     return 1367 * fOrbital * extincion * Math.max(0, cosIncidencia);
 }

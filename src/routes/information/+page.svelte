@@ -40,12 +40,12 @@
         radiación solar recibida.
       </li>
       <li>
-        <strong>Acimut:</strong> Ángulo horizontal que indica la dirección hacia la que apunta el panel solar, medido en grados
+        <strong>Orientación:</strong> Ángulo horizontal que indica la dirección hacia la que apunta el panel solar, medido en grados
         desde el sur (0°) en sentido horario. Por ejemplo, 90° corresponde al este y -90° al oeste.
       </li>
       <li>
-        <strong>Altura:</strong> Ángulo vertical que indica la inclinación del panel solar respecto al suelo, medida en grados.
-        Una altura de 0° significa que el panel está completamente horizontal, mientras que 90° indica una posición vertical.
+        <strong>Inclinación:</strong> Ángulo vertical que indica la posición del panel solar respecto al suelo, medida en grados.
+        Una inclinación de 0° significa que el panel está completamente horizontal, mientras que 90° indica una posición vertical.
       </li>
       <li>
         <strong>Meses de no funcionamiento:</strong> Meses del año en los que el sistema fotovoltaico no estará operativo,
@@ -72,7 +72,7 @@
       <li>
         <strong>Configurar restricciones avanzadas:</strong> En la sección de configuración avanzada se puede definir:
         <ul>
-          <li>Restricciones en <strong>orientación (acimut)</strong> e <strong>inclinación (altura)</strong> de los paneles</li>
+          <li>Restricciones en <strong>orientación</strong> e <strong>inclinación</strong> de los paneles</li>
           <li>Meses de funcionamiento del sistema</li>
         </ul>
       </li>

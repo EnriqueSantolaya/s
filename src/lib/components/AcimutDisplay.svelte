@@ -4,7 +4,7 @@
 
 <div class="input-group">
   <div class="value-label">
-    Acimut: {acimut}°
+    Orientación: {acimut}°
   </div>
 
   <div class="arrow-container">
@@ -16,7 +16,7 @@
 
       {#if acimut !== null}
         <g
-          style="transform: rotate({acimut + 180}deg); transform-origin: 50% 50%;"
+          style="transform: rotate({-(acimut) + 180}deg); transform-origin: 50% 50%;"
         >
           <line x1="50" y1="80" x2="50" y2="20" stroke="black" stroke-width="4" />
           <polygon points="50,10 42,25 58,25" fill="black" />

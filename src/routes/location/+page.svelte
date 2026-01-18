@@ -84,7 +84,7 @@
     <p>Pulsa y arrastra para moverte en el mapa, haz click para seleccionar la localización</p>
     
     <!-- Map Container -->
-    <div id="map" style="height: 400px; width: 80%; border: 1px solid black;"></div>
+    <div id="map"></div>
 
     <!-- Latitude Input -->
     <div>
@@ -121,8 +121,9 @@
 
   /* Estilos del mapa y contenedor */
   #map {
+    box-sizing: border-box;
     height: 400px; 
-    width: 80%; 
+    width: 100%; 
     border-radius: 14px;
     border: 1px solid rgba(15, 23, 42, 0.15);
     overflow: hidden;
@@ -138,26 +139,26 @@
     flex-direction: column;
     align-items: center;
 
+    width: clamp(280px, 90%, 600px);
     background: white;
-    border-radius: 16px;
-    padding: 12px;
+    border-radius: 20px;
+    padding: 24px;
     margin: 0 auto;
 
-    width: 100%;
-    max-width: 900px;
 
     box-shadow:
       0 10px 30px rgba(15, 23, 42, 0.12);
   }
   .container h2 {
-    margin-top: 0;
-    margin-bottom: 2px;
+    margin-top: 8px;
+    margin-bottom: 10px;
     font-size: 1.2rem;
     font-weight: 600;
     color: #0f172a;
   }
   .container p {
-    margin: 4px 0;
+    margin-top: 4px;
+    margin-bottom: 12px;
     font-size: 0.8rem;
     color: rgba(15, 23, 42, 0.7);
   }
@@ -169,7 +170,8 @@
   }
 
   input[type="number"] {
-    margin-top: 6px;
+    margin-top: 12px;
+    margin-bottom: 8px;
     padding: 6px 12px;
     font-size: 0.9rem;
 
@@ -183,39 +185,13 @@
     border-color: #facc15;
   }
 
-  button.nav-circle {
-    background: none;
-    padding: 0;
-    margin: 0;
-    outline: none;
-    border: 1px solid black;
-
-    width: 80px;
-    height: 60px;
-    border-radius: 50%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-family: inherit;
-    font-size: 14px;
-    line-height: 1.2;
-    color: inherit;
-  }
-
-  button.nav-circle:focus {
-    outline: none;
-  }
-
   .bottom-button {
     align-self: center;
-    margin-top: auto;
 
     padding: 12px 24px;
     width: 220px;
 
-    margin-top: 10px;
+    margin-top: 24px;
     margin-bottom: 10px;
 
     font-size: 1rem;

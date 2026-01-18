@@ -11,11 +11,15 @@ export async function POST({ request }) {
   const {
     latitud,
     meses,
-    obstacles
+    obstacles,
+    acimut: acimutBody,
+    altura: alturaBody
   } = body as {
     latitud: number;
     meses?: number[];
     obstacles?: Obstacle[];
+    acimut?: number;
+    altura?: number;
   };
 
   // Validaciones básicas
@@ -26,8 +30,13 @@ export async function POST({ request }) {
     );
   }
 
-  let acimut: number = 0;
-  let altura: number = 3.1 + Math.abs(latitud)*0.76;
+  let acimut: number = acimutBody !== undefined
+    ? acimutBody
+    : latitud < 0 ? 180 : 0;
+
+  let altura: number = alturaBody !== undefined
+    ? alturaBody
+    : 3.1 + Math.abs(latitud) * 0.76;
 
   let energia: number;
 

@@ -92,6 +92,11 @@
   cursor: pointer;
 }
 
+.nav-circle.completed.nav-circle.clickable:hover {
+  background: #facc15;
+  transform: translateY(-2px);
+}
+
 .nav-circle.clickable:hover {
   background: #f8fafc;
   transform: translateY(-2px);

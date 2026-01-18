@@ -243,4 +243,43 @@
       transform: translateY(0);
     }
   }
+
+@media (max-width: 480px) {
+  .top-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    height: 56px;
+    padding: 0 12px;
+
+    border-top: 1px solid rgba(15, 23, 42, 0.12);
+    border-bottom: none;
+
+    background: white;
+    box-shadow: 0 -6px 20px rgba(15, 23, 42, 0.15);
+
+    z-index: 100;
+  }
+
+  .top-bar h1 {
+    font-size: 1rem;
+  }
+
+  .right button {
+    padding: 10px;
+    font-size: 1.1rem;
+  }
+
+  .dropdown {
+    top: auto;
+    bottom: calc(100% + 8px);
+  }
+
+  main {
+    height: auto;
+    padding-bottom: 70px; 
+  }
+}
 </style>
