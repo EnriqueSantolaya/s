@@ -5,6 +5,8 @@
     import { obstaclesStore } from '$lib/stores/obstacles';
     import { onMount } from 'svelte';
     import { elevacionPlacaStore } from '$lib/stores/elevacionPlaca';
+    import { userStore } from '$lib/stores/user';
+    import { getCachedBestPosition, setCachedBestPosition } from '$lib/stores/bestPositionCache';
     import { goto } from '$app/navigation';
     import TopNav from '$lib/components/TopNav.svelte';
     import AcimutDisplay from '$lib/components/AcimutDisplay.svelte';
@@ -16,7 +18,6 @@
     const obstacles = obstaclesStore;
     const elevacionPlaca = elevacionPlacaStore;
 
-    let user: { id: string; username: string } | null = null;
     let projectName = '';
 
     // Resultado de mejor posición
@@ -31,18 +32,26 @@
     let energiaPorMes: MonthlyResult[] = [];
 
     async function fetchBestPosition() {
+        const params = {
+            latitud: $latitudStore,
+            longitud: $longitudStore,
+            altura: $configAvanzadaStore.altura ?? undefined,
+            acimut: $configAvanzadaStore.acimut ?? undefined,
+            meses: $configAvanzadaStore.meses ?? undefined,
+            elevacionPlaca: $elevacionPlacaStore ?? 0,
+            obstacles: $obstaclesStore
+        };
+        const cached = getCachedBestPosition(params);
+        if (cached) {
+            bestPosition = cached;
+            return;
+        }
+
         try {
             const response = await fetch('/api/get-best-position', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    latitud: $latitud,
-                    altura: $cavanzada.altura ?? undefined,
-                    acimut: $cavanzada.acimut ?? undefined,
-                    meses: $cavanzada.meses ?? undefined,
-                    elevacionPlaca: $elevacionPlaca ?? 0,
-                    obstacles: $obstacles
-                })
+                body: JSON.stringify(params)
             });
 
             const data = await response.json();
@@ -51,6 +60,7 @@
                 bestPosition = null;
             } else {
                 bestPosition = data;
+                setCachedBestPosition(params, data);
                 errorMessage = null;
             }
         } catch (err) {
@@ -120,6 +130,7 @@
                 latitud: $latitud,
                 longitud: $longitud,
                 meses: $cavanzada.meses ?? [],
+                elevacionPlaca: $elevacionPlaca ?? 0,
                 alturaFija: $cavanzada.altura ?? null,
                 acimutFijo: $cavanzada.acimut ?? null,
                 altura: bestPosition.altura,
@@ -138,14 +149,7 @@
         }
     }
 
-    async function checkAuth() {
-        const res = await fetch('/api/auth');
-        const data = await res.json();
-        user = data.user ?? null;
-    }
-
     onMount(() => {
-        checkAuth();
         if ($latitud === null) {
             goto('/location');
             return;
@@ -153,6 +157,7 @@
             goto('/cavanzada');
             return;
         }   
+
         fetchBestPosition();
     });
 
@@ -243,7 +248,7 @@
         <p>Calculando la mejor posición...</p>
     {/if}
 
-    {#if user && bestPosition}
+    {#if $userStore && bestPosition}
         <div class="save-project-card">
             <input
                 type="text"
@@ -256,7 +261,7 @@
                 Guardar proyecto
             </button>
         </div>
-    {:else if !user}
+    {:else if !$userStore}
         <p>Inicia sesión para guardar el proyecto</p>
     {/if}
   </div>

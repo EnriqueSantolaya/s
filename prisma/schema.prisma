@@ -31,6 +31,7 @@ model Project {
   // Parameters
   latitud   Float
   longitud  Float?
+  elevacionPlaca  Float?
   meses     Int[]
   alturaFija Int?
   acimutFijo Int?

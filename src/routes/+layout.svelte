@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { userStore } from '$lib/stores/user';
+  import { clickOutside } from '$lib/actions/clickOutside';
   import "../app.css";
 
   let showMenu = false;
@@ -60,9 +61,15 @@
       <button type="button" on:click={() => goto('/information')}>ℹ️</button>
       <!-- Menú de usuario -->
       <div class="user-menu">
-        <button type="button" on:click={() => showMenu = !showMenu}>👤</button>
+        <button 
+          type="button" 
+            on:click|stopPropagation={() => showMenu = !showMenu}
+            >
+            👤
+            </button>
+        
         {#if showMenu}
-          <div class="dropdown">
+          <div class="dropdown" use:clickOutside={() => showMenu = false}>
             {#if $userStore}
               <p>{$userStore.username}</p>
               <button type="button" on:click={logout}>Cerrar sesión</button>
@@ -273,8 +280,8 @@
     }
 
     .dropdown {
-      top: auto;
-      bottom: calc(100% + 8px);
+      top: calc(100% + 8px);
+      bottom: auto;
     }
 
     main {

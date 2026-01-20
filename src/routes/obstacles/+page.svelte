@@ -237,6 +237,12 @@
       type="number"
       min="0"
       bind:value={$elevacionPlacaStore}
+      on:input={(e) => {
+        const v = e.currentTarget.valueAsNumber;
+        elevacionPlacaStore.set(
+          Number.isFinite(v) && v >= 0 ? v : 0
+        );
+      }}
     />
   </div>
 

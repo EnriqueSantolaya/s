@@ -5,6 +5,9 @@
   import { longitudStore } from '$lib/stores/longitud';
   import { configAvanzadaStore } from '$lib/stores/configAvanzada';
   import { obstaclesStore } from '$lib/stores/obstacles';
+  import { userStore } from '$lib/stores/user';
+  import { elevacionPlacaStore } from '$lib/stores/elevacionPlaca';
+  import { clickOutside } from '$lib/actions/clickOutside';
 
   let projects: any[] = [];
   let error: string | null = null;
@@ -28,6 +31,8 @@
   function loadProject(p: any) {
     latitudStore.set(p.latitud);
     longitudStore.set(p.longitud);
+
+    elevacionPlacaStore.set(p.elevacionPlaca ?? 0);
 
     configAvanzadaStore.setConfig({
       altura: p.alturaFija ?? null,
@@ -59,7 +64,6 @@
       projects = projects.filter(p => p.id !== projectToDelete.id);
     }
 
-    // cerrar modal
     projectToDelete = null;
     showDeleteModal = false;
   }
@@ -69,13 +73,16 @@
     showDeleteModal = false;
   }
 
-
   onMount(() => {
     fetchProjects();
   });
 
   function goBack() {
     history.back();
+  }
+
+  $: if ($userStore === null) {
+    goBack();
   }
 </script>
 
@@ -118,7 +125,7 @@
 
     {#if showDeleteModal && projectToDelete}
       <div class="modal-backdrop">
-        <div class="modal">
+        <div class="modal" use:clickOutside={cancelDelete}>
           <h3>¿Eliminar proyecto?</h3>
           <p>Vas a eliminar <strong>{projectToDelete.name}</strong>. Esta acción no se puede deshacer.</p>
           <div class="modal-buttons">

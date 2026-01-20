@@ -140,7 +140,6 @@
     font-size: 0.95rem;
     border-radius: 10px;
     border: 1px solid rgba(15, 23, 42, 0.2);
-    width: 100%;
   }
 
   .signup-form input:focus {

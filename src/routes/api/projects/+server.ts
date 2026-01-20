@@ -52,6 +52,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
         altura,
         acimut,
         energia,
+        elevacionPlaca,
         obstacles
     } = await request.json();
 
@@ -68,6 +69,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
             name: name?.trim() || 'Proyecto',
             latitud,
             meses,
+            elevacionPlaca: elevacionPlaca,
             alturaFija: alturaFija ?? null,
             acimutFijo: acimutFijo ?? null,
             altura: altura ?? null,
