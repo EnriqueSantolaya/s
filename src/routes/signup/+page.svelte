@@ -81,7 +81,6 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    min-height: calc(100vh - 40px);
     padding: 20px;
     background: linear-gradient(to bottom, #eaf7ff 0%, #ffffff 70%);
     font-family: 'Poppins', system-ui, sans-serif;

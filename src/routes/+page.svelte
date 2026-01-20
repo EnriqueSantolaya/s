@@ -32,7 +32,7 @@
 
     .loading-container {
         font-family: 'Poppins', system-ui, sans-serif;
-        min-height: 100vh;
+        height: calc(100vh - 40px);
         display: flex;
         flex-direction: column;
         justify-content: center;
