@@ -13,23 +13,20 @@
 
     <h5>Método diseñado</h5>
     <p>
-        Esta aplicación utiliza un método avanzado para optimizar la orientación e inclinación de los paneles solares a partir
-        del análisis de la radiación solar a lo largo de todo el año. En lugar de basarse en una estimación puntual, el sistema
-        integra la radiación instantánea en cada momento relevante, transformándola en una estimación anual de la energía
-        captada. Además, el método tiene en cuenta factores reales como sombras proyectadas por edificios, árboles u otros
-        obstáculos, descartando los instantes en los que la radiación queda bloqueada. Esto permite comparar múltiples
-        configuraciones y determinar la posición que maximiza la producción energética, incluso cuando existen restricciones
-        físicas que impiden adoptar la orientación ideal.
+        Este método optimiza la orientación e inclinación de los paneles solares considerando la radiación solar a lo largo 
+        de todo el año. A diferencia de enfoques simplificados, integra la radiación instantánea en cada momento relevante y 
+        descarta los periodos en los que la radiación se ve bloqueada por sombras de edificios, árboles u otros obstáculos. 
+        Gracias a esto, permite comparar diferentes configuraciones y determinar la posición que maximiza la producción 
+        energética, incluso cuando existen limitaciones físicas que impiden alcanzar la orientación ideal.
     </p>
 
     <h5>Método clásico</h5>
     <p>
-        En contraste, los métodos clásicos utilizados habitualmente se basan en fórmulas empíricas que relacionan la inclinación
-        del panel únicamente con la latitud, asumiendo además una orientación general hacia el sur o el norte según el
-        hemisferio. Aunque este enfoque puede ofrecer resultados aceptables en condiciones ideales, no considera la variación
-        real de la radiación solar ni el impacto de sombras u obstáculos locales. Como consecuencia, la estimación de energía
-        producida puede alejarse significativamente de la realidad. El enfoque de esta aplicación supera estas limitaciones
-        al ofrecer un análisis personalizado y mucho más preciso para cada ubicación.
+        El método clásico utiliza fórmulas empíricas basadas en la latitud para estimar la inclinación óptima y orienta 
+        los paneles generalmente hacia el sur (en el hemisferio norte) o norte (en el hemisferio sur). Estas aproximaciones 
+        no consideran la variación real de la radiación solar ni la influencia de sombras u obstáculos locales, lo que puede 
+        reducir la eficiencia energética en situaciones reales. Su simplicidad limita la precisión, y no permite adaptar la 
+        estimación a las condiciones específicas de cada instalación.
     </p>
     
     <h5>Explicación de términos</h5>
@@ -48,9 +45,9 @@
         Una inclinación de 0° significa que el panel está completamente horizontal, mientras que 90° indica una posición vertical.
       </li>
       <li>
-        <strong>Meses de no funcionamiento:</strong> Meses del año en los que el sistema fotovoltaico no estará operativo,
-        ya sea por mantenimiento, condiciones climáticas adversas u otras razones. Estos meses se excluyen del cálculo de
-        la orientación e inclinación óptimas del panel solar.
+        <strong>Meses de funcionamiento:</strong> Meses del año en los que el sistema fotovoltaico estará operativo,
+        lo cual se puede deber limitar por mantenimiento, condiciones climáticas adversas u otras razones. Estos 
+        meses serán los únicos incluidos en el cálculo de la orientación e inclinación óptimas del panel solar.
       </li>
     </ul>
 
@@ -174,24 +171,24 @@
   }
 
   .instructions-list {
-  margin: 0;
-  padding-left: 1.4rem; 
-}
+    margin: 0;
+    padding-left: 1.4rem; 
+  }
 
-.instructions-list li {
-  margin-bottom: 16px;
-  line-height: 1.6;
-}
+  .instructions-list li {
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
 
-.instructions-list li ul {
-  list-style-type: disc;
-  margin-top: 8px;
-  margin-bottom: 0;
-  padding-left: 1.2rem;
-}
+  .instructions-list li ul {
+    list-style-type: disc;
+    margin-top: 8px;
+    margin-bottom: 0;
+    padding-left: 1.2rem;
+  }
 
-.instructions-list li ul li {
-  margin-bottom: 6px;
-}
+  .instructions-list li ul li {
+    margin-bottom: 6px;
+  }
 </style>
 

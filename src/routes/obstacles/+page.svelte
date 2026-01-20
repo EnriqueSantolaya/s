@@ -167,6 +167,12 @@
 
   function removeObstacle(index: number) {
     obstaclesStore.update(obs => obs.filter((_, i) => i !== index));
+
+    if (selectedIndex === index) {
+      showAddPanel = false;
+      selectedIndex = null;
+      isEditing = false;
+    }
   }
 
   onMount(() => {
